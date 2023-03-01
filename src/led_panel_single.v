@@ -19,7 +19,7 @@ module led_panel_single (
   reg              red;
   reg              green;
   reg              blue;
-  reg [5:0]        col_cnt;
+  reg [7:0]        col_cnt;
 
   // row
   reg              aclk;
@@ -45,7 +45,7 @@ module led_panel_single (
       blank     <= 1'b1;
       latch     <= 1'b1;
       sclk      <= 1'b0;
-      col_cnt   <= 6'b00000;
+      col_cnt   <= 8'b0000000;
       row_cnt   <= 6'b00000;
       arst      <= 1'b1;
       aclk      <= 1'b0;
@@ -59,17 +59,18 @@ module led_panel_single (
           sclk      <= 1'b0;
           arst      <= 1'b0;
           aclk      <= 1'b0;
-          col_cnt   <= 6'b00000;
+          col_cnt   <= 8'b0000000;
         end
         CLOCK1: begin
-          if (col_cnt == 6'b111111) begin
+          // fixed at 64 columns
+          if (col_cnt == 8'b00111111) begin
             state <= LATCH;
           end else begin
             state <= CLOCK2;
           end
           // clock fall
           sclk      <= 1'b0;
-          blue <= 1'b0;
+          blue <= 1'b1;
           red  <= 1'b0;
         end
         CLOCK2: begin
@@ -77,7 +78,7 @@ module led_panel_single (
           col_cnt <= col_cnt + 1;
           // clock rise
           sclk      <= 1'b1;
-          blue <= 1'b1;
+          blue <= 1'b0;
           red  <= 1'b1;
         end
         LATCH: begin
@@ -91,10 +92,10 @@ module led_panel_single (
           // blank off, latch off
           blank     <= 1'b0;
           latch     <= 1'b1;
-          col_cnt <= 6'b00000;
+          col_cnt <= 8'b0000000;
         end
         PAUSE: begin
-          if (col_cnt == 6'b111111) begin
+          if (col_cnt == 8'b11111111) begin
             state <= NEXTROW;
           end else begin
             col_cnt <= col_cnt + 1;

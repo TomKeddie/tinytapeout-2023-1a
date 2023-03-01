@@ -13,7 +13,15 @@ module top
    output P2_10,
    input  P1A1,
    input  P1A2,
-   input  P1A3
+   input  P1A3,
+   output P1B1,
+   output P1B2,
+   output P1B3,
+   output P1B4,
+   output P1B7,
+   output P1B8,
+   output P1B9,
+   output P1B10
    );
 
   reg     clk_dut;
@@ -43,6 +51,14 @@ module top
   assign P2_8 = arst;
   assign P2_9 = sclk;
   assign P2_10 = latch;
+  assign P1B1 = red;
+  assign P1B2 = blue;
+  assign P1B3 = aclk;
+  assign P1B4 = blank;
+  assign P1B7 = green;
+  assign P1B8 = arst;
+  assign P1B9 = sclk;
+  assign P1B10 = latch;
   assign rowmax[0] = P1A1;
   assign rowmax[1] = P1A2;
   assign rowmax[2] = P1A3;
@@ -78,15 +94,15 @@ module top
 
   // instantiate the component
   led_panel_single top(.clk(CLK),
-                       .reset(rst_delayed), 
-                       .red_out(red),     
-                       .blue_out(blue),    
-                       .aclk_out(aclk),    
-                       .blank_out(blank),   
-                       .green_out(green),  
-                       .arst_out(arst),    
-                       .sclk_out(sclk),    
-                       .latch_out(latch),  
+                       .reset(rst_delayed),
+                       .red_out(red),
+                       .blue_out(blue),
+                       .aclk_out(aclk),
+                       .blank_out(blank),
+                       .green_out(green),
+                       .arst_out(arst),
+                       .sclk_out(sclk),
+                       .latch_out(latch),
                        .rowmax_in(rowmax)
                        );              
 
