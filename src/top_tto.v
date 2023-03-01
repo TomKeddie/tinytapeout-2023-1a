@@ -8,6 +8,7 @@ module tomkeddie_top_tto_a
    );
 
   wire          clk;
+  wire          rst;
   wire          red; 
   wire          blue;
   wire          aclk;
