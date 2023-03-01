@@ -35,7 +35,7 @@ module tomkeddie_top_tto_a
 
   // instantiate the component
   led_panel_single top(.clk(clk),
-                       .reset(rst_delayed), 
+                       .reset(rst), 
                        .red_out(red),     
                        .blue_out(blue),    
                        .aclk_out(aclk),    
