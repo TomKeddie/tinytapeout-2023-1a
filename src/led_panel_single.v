@@ -1,32 +1,45 @@
+module font_one(input [2:0] row, output [4:0] data);
+  case(row)
+    3'b000: assign data = 5'b00100;
+    3'b001: assign data = 5'b01100;
+    3'b010: assign data = 5'b00100;
+    3'b011: assign data = 5'b00100;
+    3'b100: assign data = 5'b00100;
+    3'b101: assign data = 5'b00100;
+    3'b110: assign data = 5'b01110;
+  endcase // case (row)
+endmodule
+
 module led_panel_single (
-	        input  clk,
-            input  reset,
-            output red_out,
-            output blue_out,
-            output aclk_out,
-            output blank_out,
-            output green_out,
-            output arst_out,
-            output sclk_out,
-            output latch_out,
-            input  [2:0] rowmax_in
-            );
+	                     input       clk,
+                         input       reset,
+                         output      red_out,
+                         output      blue_out,
+                         output      aclk_out,
+                         output      blank_out,
+                         output      green_out,
+                         output      arst_out,
+                         output      sclk_out,
+                         output      latch_out,
+                         input [2:0] rowmax_in
+                         );
 
   // column
-  reg              sclk;
-  reg              blank;
-  reg              latch;
-  reg              red;
-  reg              green;
-  reg              blue;
-  reg [7:0]        col_cnt;
+  reg                                sclk;
+  reg                                blank;
+  reg                                latch;
+  reg                                red;
+  reg                                green;
+  reg                                blue;
+  reg [7:0]                          col_cnt;
+  reg                                alternate;
 
   // row
-  reg              aclk;
-  reg              arst;
-  reg [5:0]        row_cnt;
+  reg                                aclk;
+  reg                                arst;
+  reg [5:0]                          row_cnt;
 
-  reg [2:0]        state;
+  reg [2:0]                          state;
   localparam       FIRSTCOL = 3'b000;
   localparam       CLOCK1 = 3'b001;
   localparam       CLOCK2 = 3'b010;
@@ -38,17 +51,18 @@ module led_panel_single (
   // Columns
   always @(posedge clk) begin
     if (reset == 1'b0) begin
-      state <= FIRSTCOL;
-      red       <= 1'b0;
-      green     <= 1'b0;
-      blue      <= 1'b0;
-      blank     <= 1'b1;
-      latch     <= 1'b1;
-      sclk      <= 1'b0;
-      col_cnt   <= 8'b0000000;
-      row_cnt   <= 6'b00000;
-      arst      <= 1'b1;
-      aclk      <= 1'b0;
+      state   <= FIRSTCOL;
+      red     <= 1'b0;
+      green   <= 1'b0;
+      blue    <= 1'b0;
+      blank   <= 1'b1;
+      latch   <= 1'b1;
+      sclk    <= 1'b0;
+      col_cnt <= 8'b0000000;
+      row_cnt <= 6'b00000;
+      arst    <= 1'b1;
+      aclk    <= 1'b0;
+      alternate <= 1'b0;
     end else begin
       case(state)
         FIRSTCOL: begin
@@ -69,17 +83,34 @@ module led_panel_single (
             state <= CLOCK2;
           end
           // clock fall
-          sclk      <= 1'b0;
-          blue <= 1'b1;
-          red  <= 1'b0;
+          sclk <= 1'b0;
+          // lower half data on falling edge
+          if (alternate == 1'b0) begin
+            blue  <= 1'b1;
+            red   <= 1'b1;
+            green <= 1'b1;
+          end else begin
+            blue  <= 1'b0;
+            red   <= 1'b0;
+            green <= 1'b1;
+          end
         end
         CLOCK2: begin
-          state <= CLOCK1;
+          state   <= CLOCK1;
           col_cnt <= col_cnt + 1;
           // clock rise
-          sclk      <= 1'b1;
-          blue <= 1'b0;
-          red  <= 1'b1;
+          sclk    <= 1'b1;
+          // upper half data on rising edge
+          if (alternate == 1'b0) begin
+            blue  <= 1'b1;
+            red   <= 1'b1;
+            green <= 1'b0;
+          end else begin
+            blue  <= 1'b1;
+            red   <= 1'b0;
+            green <= 1'b0;
+          end
+          alternate <= ~alternate;
         end
         LATCH: begin
           state             <= UNBLANK;
