@@ -57,7 +57,7 @@ module led_panel_single (
       blue    <= 1'b0;
       blank   <= 1'b1;
       latch   <= 1'b1;
-      sclk    <= 1'b0;
+      sclk    <= 1'b1;
       col_cnt <= 8'b0000000;
       row_cnt <= 6'b00000;
       arst    <= 1'b1;
@@ -69,51 +69,49 @@ module led_panel_single (
           // blank on, other off
           blank     <= 1'b1;
           latch     <= 1'b1;
-          sclk      <= 1'b0;
           arst      <= 1'b0;
           aclk      <= 1'b0;
-          col_cnt   <= 8'b0000000;
+          col_cnt   <= 8'b00100000;
         end
         CLOCK1: begin
-          // fixed at 64 columns
-          if (col_cnt >= 8'b00100000) begin
+          // fixed at 32 horizontal pixels
+          if (col_cnt == 0) begin
             state <= LATCH;
           end else begin
             state <= CLOCK2;
+            // clock fall
+            sclk <= 1'b0;
           end
-          // clock fall
-          sclk <= 1'b0;
           // lower half data on falling edge
-          if (col_cnt < 16) begin
-            red   <= 1'b1;
-            green <= 1'b0;
+          if (col_cnt < 32) begin
+            red   <= 1'b0;
+            green <= 1'b1;
             blue  <= 1'b0;
           end else begin
-            red   <= 1'b1;
-            green <= 1'b0;
+            red   <= 1'b0;
+            green <= 1'b1;
             blue  <= 1'b1;
           end
         end
         CLOCK2: begin
           state   <= CLOCK1;
-          col_cnt <= col_cnt + 1;
+          col_cnt <= col_cnt - 1;
           // clock rise
           sclk    <= 1'b1;
           // upper half data on rising edge
-          if (col_cnt < 16) begin
+          if (col_cnt < 32) begin
+            red   <= 1'b1;
+            green <= 1'b0;
+            blue  <= 1'b0;
+          end else begin
             red   <= 1'b0;
             green <= 1'b0;
             blue  <= 1'b1;
-          end else begin
-            red   <= 1'b0;
-            green <= 1'b1;
-            blue  <= 1'b0;
           end
         end
         LATCH: begin
           state             <= UNBLANK;
-          // clock fall, latch on
-          sclk                  <= 1'b0;
+          // latch on
           latch                 <= 1'b0;
         end
         UNBLANK: begin
@@ -124,6 +122,7 @@ module led_panel_single (
           col_cnt <= 8'b0000000;
         end
         PAUSE: begin
+          // reuse col_cnt counter for delay
           if (col_cnt == 8'b00000010) begin
             state <= NEXTROW;
           end else begin
