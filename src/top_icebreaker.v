@@ -14,6 +14,7 @@ module top
    input  P1A1,
    input  P1A2,
    input  P1A3,
+   input  P1A4,
    output P1B1,
    output P1B2,
    output P1B3,
@@ -63,7 +64,6 @@ module top
   assign rowmax[1] = P1A2;
   assign rowmax[2] = P1A3;
   assign rowmax[3] = P1A4;
-
     
   // clock divider
   always @(posedge CLK) begin

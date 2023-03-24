@@ -58,7 +58,7 @@ module led_panel_single (
       blank   <= 1'b1;
       latch   <= 1'b1;
       sclk    <= 1'b1;
-      col_cnt <= 8'b0000000;
+      col_cnt <= 8'b00100000;
       row_cnt <= 6'b00000;
       arst    <= 1'b1;
       aclk    <= 1'b0;
@@ -83,7 +83,7 @@ module led_panel_single (
             sclk <= 1'b0;
           end
           // lower half data on falling edge
-          if (col_cnt < 32) begin
+          if (col_cnt[0] == 1'b0) begin
             red   <= 1'b0;
             green <= 1'b1;
             blue  <= 1'b0;
@@ -99,7 +99,7 @@ module led_panel_single (
           // clock rise
           sclk    <= 1'b1;
           // upper half data on rising edge
-          if (col_cnt < 32) begin
+          if (col_cnt[0] == 1'b0) begin
             red   <= 1'b1;
             green <= 1'b0;
             blue  <= 1'b0;
@@ -113,6 +113,8 @@ module led_panel_single (
           state             <= UNBLANK;
           // latch on
           latch                 <= 1'b0;
+          // blank here is brighter but much more flicker
+          // blank     <= 1'b1;
         end
         UNBLANK: begin
           state <= PAUSE;
