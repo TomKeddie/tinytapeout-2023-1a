@@ -9,8 +9,8 @@ async def top(dut):
     cocotb.start_soon(clock.start())
     
     dut._log.info("reset")
-    dut.reset.value = 0
-    await ClockCycles(dut.clk, 10)
     dut.reset.value = 1
+    await ClockCycles(dut.clk, 10)
+    dut.reset.value = 0
 
-    await ClockCycles(dut.clk, 14000)
+    await ClockCycles(dut.clk, 100000)

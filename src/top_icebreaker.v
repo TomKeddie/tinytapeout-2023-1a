@@ -1,5 +1,5 @@
 module top
-  #(parameter DIVIDER=6000, DELAY_BIT=15)
+  #(parameter DIVIDER=500, DELAY_BIT=15)
   (
    input  CLK,
    input  BTN_N,
@@ -33,7 +33,7 @@ module top
   wire    arst;
   wire    sclk;
   wire    latch;
-  wire    rowmax;
+  wire [3:0]   rowmax;
   
   reg [15:0] clk_divide_counter;
   reg [15:0]   rst_delay_counter;
@@ -42,7 +42,7 @@ module top
   reg          rst_delayed;
 
   // wire up the inputs and outputs
-  assign rst = BTN_N;
+  assign rst = ~BTN_N;
   assign P2_1 = red;
   assign P2_2 = blue;
   assign P2_3 = aclk;
@@ -62,6 +62,8 @@ module top
   assign rowmax[0] = P1A1;
   assign rowmax[1] = P1A2;
   assign rowmax[2] = P1A3;
+  assign rowmax[3] = P1A4;
+
     
   // clock divider
   always @(posedge CLK) begin
@@ -87,13 +89,14 @@ module top
 	  end else if (rst_delay_counter[DELAY_BIT] == 1'b1) begin
 		rst_delayed <= 1'b0;
       end else begin
+		rst_delayed <= 1'b1;
         rst_delay_counter <= rst_delay_counter + 1;
       end
     end
   end
 
   // instantiate the component
-  led_panel_single top(.clk(CLK),
+  led_panel_single top(.clk(clk_dut),
                        .reset(rst_delayed),
                        .red_out(red),
                        .blue_out(blue),

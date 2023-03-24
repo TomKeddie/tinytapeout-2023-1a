@@ -1,3 +1,4 @@
+// http://legionfonts.com/fonts/alphanumeric-lcd
 module font_one(input [2:0] row, output [4:0] data);
   case(row)
     3'b000: assign data = 5'b00100;
@@ -21,7 +22,7 @@ module led_panel_single (
                          output      arst_out,
                          output      sclk_out,
                          output      latch_out,
-                         input [2:0] rowmax_in
+                         input [3:0] rowmax_in
                          );
 
   // column
@@ -32,7 +33,6 @@ module led_panel_single (
   reg                                green;
   reg                                blue;
   reg [7:0]                          col_cnt;
-  reg                                alternate;
 
   // row
   reg                                aclk;
@@ -50,7 +50,7 @@ module led_panel_single (
   
   // Columns
   always @(posedge clk) begin
-    if (reset == 1'b0) begin
+    if (reset == 1'b1) begin
       state   <= FIRSTCOL;
       red     <= 1'b0;
       green   <= 1'b0;
@@ -62,7 +62,6 @@ module led_panel_single (
       row_cnt <= 6'b00000;
       arst    <= 1'b1;
       aclk    <= 1'b0;
-      alternate <= 1'b0;
     end else begin
       case(state)
         FIRSTCOL: begin
@@ -77,7 +76,7 @@ module led_panel_single (
         end
         CLOCK1: begin
           // fixed at 64 columns
-          if (col_cnt == 8'b00111111) begin
+          if (col_cnt >= 8'b00100000) begin
             state <= LATCH;
           end else begin
             state <= CLOCK2;
@@ -85,14 +84,14 @@ module led_panel_single (
           // clock fall
           sclk <= 1'b0;
           // lower half data on falling edge
-          if (alternate == 1'b0) begin
-            blue  <= 1'b1;
+          if (col_cnt < 16) begin
             red   <= 1'b1;
-            green <= 1'b1;
-          end else begin
+            green <= 1'b0;
             blue  <= 1'b0;
-            red   <= 1'b0;
-            green <= 1'b1;
+          end else begin
+            red   <= 1'b1;
+            green <= 1'b0;
+            blue  <= 1'b1;
           end
         end
         CLOCK2: begin
@@ -101,16 +100,15 @@ module led_panel_single (
           // clock rise
           sclk    <= 1'b1;
           // upper half data on rising edge
-          if (alternate == 1'b0) begin
-            blue  <= 1'b1;
-            red   <= 1'b1;
-            green <= 1'b0;
-          end else begin
-            blue  <= 1'b1;
+          if (col_cnt < 16) begin
             red   <= 1'b0;
             green <= 1'b0;
+            blue  <= 1'b1;
+          end else begin
+            red   <= 1'b0;
+            green <= 1'b1;
+            blue  <= 1'b0;
           end
-          alternate <= ~alternate;
         end
         LATCH: begin
           state             <= UNBLANK;
@@ -126,7 +124,7 @@ module led_panel_single (
           col_cnt <= 8'b0000000;
         end
         PAUSE: begin
-          if (col_cnt == 8'b11111111) begin
+          if (col_cnt == 8'b00000010) begin
             state <= NEXTROW;
           end else begin
             col_cnt <= col_cnt + 1;
@@ -134,7 +132,7 @@ module led_panel_single (
         end
         NEXTROW: begin
           state <= FIRSTCOL;
-          if (row_cnt[0] == 1'b1 && row_cnt[1] == 1'b1 && row_cnt[2] == 1'b1 && row_cnt[3] == rowmax_in[0] && row_cnt[4] == rowmax_in[1] && row_cnt[5] == rowmax_in[2]) begin
+          if (row_cnt[0] == 1'b1 && row_cnt[1] == 1'b1) begin // && row_cnt[2] == rowmax_in[0] && row_cnt[3] == rowmax_in[1] && row_cnt[4] == rowmax_in[2] && row_cnt[5] == rowmax_in[3]) begin
             row_cnt <= 6'b000000;
             arst    <= 1'b1;
           end else begin
@@ -148,10 +146,10 @@ module led_panel_single (
   
   assign red_out = red;
   assign blue_out = blue;
-  assign aclk_out = aclk;
   assign blank_out = blank;
   assign green_out = green;
   assign arst_out = arst;
+  assign aclk_out = aclk;
   assign sclk_out = sclk;
-  assign latch_out = latch;
+  assign latch_out = ~latch;
 endmodule
