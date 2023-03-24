@@ -1,0 +1,3 @@
+[submodule "src/icebreaker-examples"]
+	path = src/icebreaker-examples
+	url = https://github.com/icebreaker-fpga/icebreaker-examples.git
