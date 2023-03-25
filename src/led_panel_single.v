@@ -1,16 +1,3 @@
-// http://legionfonts.com/fonts/alphanumeric-lcd
-module font_one(input [2:0] row, output [4:0] data);
-  case(row)
-    3'b000: assign data = 5'b00100;
-    3'b001: assign data = 5'b01100;
-    3'b010: assign data = 5'b00100;
-    3'b011: assign data = 5'b00100;
-    3'b100: assign data = 5'b00100;
-    3'b101: assign data = 5'b00100;
-    3'b110: assign data = 5'b01110;
-  endcase // case (row)
-endmodule
-
 module led_panel_single (
 	                     input       clk,
                          input       reset,
