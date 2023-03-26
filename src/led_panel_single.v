@@ -1,3 +1,21 @@
+// BA=00 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=01 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=10 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=11 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=00 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=01 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=10 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=11 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+//
+// BA=00 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=01 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=10 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=11 | 23 22 21 20 19 18 17 16 07 06 05 04 03 02 01 00
+// BA=00 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=01 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=10 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+// BA=11 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
+
 module led_panel_single (
 	                     input       clk,
                          input       reset,
@@ -19,12 +37,12 @@ module led_panel_single (
   reg                                red;
   reg                                green;
   reg                                blue;
-  reg [7:0]                          col_cnt;
+  reg [5:0]                          col_cnt;
 
   // row
   reg                                aclk;
   reg                                arst;
-  reg [5:0]                          row_cnt;
+  reg [1:0]                          row_cnt;
 
   reg [2:0]                          state;
   localparam       FIRSTCOL = 3'b000;
@@ -34,7 +52,11 @@ module led_panel_single (
   localparam       UNBLANK = 3'b100;
   localparam       PAUSE = 3'b101;
   localparam       NEXTROW = 3'b110;
-  
+
+  reg [15:0]  frame_buffer [15:0];
+  wire [3:0] frame_column;
+  wire [3:0] frame_row;
+
   // Columns
   always @(posedge clk) begin
     if (reset == 1'b1) begin
@@ -45,39 +67,110 @@ module led_panel_single (
       blank   <= 1'b1;
       latch   <= 1'b1;
       sclk    <= 1'b1;
-      col_cnt <= 8'b00100000;
-      row_cnt <= 6'b00000;
+      col_cnt <= 6'b000000;
+      row_cnt <= 2'b00;
       arst    <= 1'b1;
       aclk    <= 1'b0;
+      frame_buffer[4'b0000] <= 4'b0;
+      frame_buffer[4'b0001] <= 4'b0;
+      frame_buffer[4'b0010] <= 4'b0;
+      frame_buffer[4'b0011] <= 4'b0;
+      frame_buffer[4'b0100] <= 4'b0;
+      frame_buffer[4'b0101] <= 4'b0;
+      frame_buffer[4'b0110] <= 4'b0;
+      frame_buffer[4'b0111] <= 4'b0;
+      frame_buffer[4'b1000] <= 4'b0;
+      frame_buffer[4'b1001] <= 4'b0;
+      frame_buffer[4'b1010] <= 4'b0;
+      frame_buffer[4'b1011] <= 4'b0;
+      frame_buffer[4'b1100] <= 4'b0;
+      frame_buffer[4'b1101] <= 4'b0;
+      frame_buffer[4'b1110] <= 4'b0;
+      frame_buffer[4'b1111] <= 4'b0;
     end else begin
       case(state)
         FIRSTCOL: begin
-          state <= CLOCK1;
+          state   <= CLOCK1;
           // blank on, other off
-          blank     <= 1'b1;
-          latch     <= 1'b1;
-          arst      <= 1'b0;
-          aclk      <= 1'b0;
-          col_cnt   <= 8'b00100000;
+          blank   <= 1'b1;
+          latch   <= 1'b1;
+          arst    <= 1'b0;
+          aclk    <= 1'b0;
+          col_cnt <= 6'b011111;
+          frame_buffer[0][0] <= 1'b1;
+          frame_buffer[1][1] <= 1'b1;
+          frame_buffer[2][2] <= 1'b1;
+          frame_buffer[3][3] <= 1'b1;
+          frame_buffer[4][4] <= 1'b1;
+          frame_buffer[5][5] <= 1'b1;
+          frame_buffer[6][6] <= 1'b1;
+          frame_buffer[7][7] <= 1'b1;
+          frame_buffer[8][8] <= 1'b1;
+          frame_buffer[9][9] <= 1'b1;
+          frame_buffer[10][10] <= 1'b1;
+          frame_buffer[11][11] <= 1'b1;
+          frame_buffer[12][12] <= 1'b1;
+          frame_buffer[13][13] <= 1'b1;
+          frame_buffer[14][14] <= 1'b1;
+          frame_buffer[15][15] <= 1'b1;
+          frame_buffer[15][0] <= 1'b1;
+          frame_buffer[14][1] <= 1'b1;
+          frame_buffer[13][2] <= 1'b1;
+          frame_buffer[12][3] <= 1'b1;
+          frame_buffer[11][4] <= 1'b1;
+          frame_buffer[10][5] <= 1'b1;
+          frame_buffer[9][6] <= 1'b1;
+          frame_buffer[8][7] <= 1'b1;
+          frame_buffer[7][8] <= 1'b1;
+          frame_buffer[6][9] <= 1'b1;
+          frame_buffer[5][10] <= 1'b1;
+          frame_buffer[4][11] <= 1'b1;
+          frame_buffer[3][12] <= 1'b1;
+          frame_buffer[2][13] <= 1'b1;
+          frame_buffer[1][14] <= 1'b1;
+          frame_buffer[0][15] <= 1'b1;
         end
         CLOCK1: begin
-          // fixed at 32 horizontal pixels
-          if (col_cnt == 0) begin
+          if (col_cnt[5] == 1'b1) begin
             state <= LATCH;
           end else begin
             state <= CLOCK2;
             // clock fall
             sclk <= 1'b0;
           end
+          // default to black
+          red   <= 1'b0;
+          green <= 1'b0;
+          blue  <= 1'b0;
           // lower half data on falling edge
-          if (col_cnt[0] == 1'b0) begin
-            red   <= 1'b0;
-            green <= 1'b1;
-            blue  <= 1'b0;
-          end else begin
-            red   <= 1'b0;
-            green <= 1'b1;
-            blue  <= 1'b1;
+          if (col_cnt < 8) begin
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b10, row_cnt}] == 1'b1) begin
+              // upper half: upper right quadrant
+              red   <= 1'b1;
+              green <= 1'b1;
+              blue  <= 1'b1;
+            end
+          end else if (col_cnt < 16) begin
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b11, row_cnt}] == 1'b1) begin
+            // upper half: lower right quadrant
+              red   <= 1'b1;
+              green <= 1'b0;
+              blue  <= 1'b1;
+            end
+          end else if (col_cnt < 24) begin
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b10, row_cnt}] == 1'b1) begin
+            // upper half: upper left quadrant
+              red   <= 1'b1;
+              green <= 1'b1;
+              blue  <= 1'b1;
+            end
+          end else begin 
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b11, row_cnt}] == 1'b1) begin
+              // upper half: lower left quadrant
+              red   <= 1'b0;
+              green <= 1'b0;
+              blue  <= 1'b1;
+            end
           end
         end
         CLOCK2: begin
@@ -85,15 +178,39 @@ module led_panel_single (
           col_cnt <= col_cnt - 1;
           // clock rise
           sclk    <= 1'b1;
+          // default to black
+          red   <= 1'b0;
+          green <= 1'b0;
+          blue  <= 1'b0;
           // upper half data on rising edge
-          if (col_cnt[0] == 1'b0) begin
-            red   <= 1'b1;
-            green <= 1'b0;
-            blue  <= 1'b0;
+          if (col_cnt < 8) begin
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b00, row_cnt}] == 1'b1) begin
+              // upper half: upper right quadrant
+              red   <= 1'b0;
+              green <= 1'b0;
+              blue  <= 1'b1;
+            end
+          end else if (col_cnt < 16) begin
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b01, row_cnt}] == 1'b1) begin
+            // upper half: lower right quadrant
+              red   <= 1'b0;
+              green <= 1'b1;
+              blue  <= 1'b0;
+            end
+          end else if (col_cnt < 24) begin
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b00, row_cnt}] == 1'b1) begin
+            // upper half: upper left quadrant
+              red   <= 1'b0;
+              green <= 1'b1;
+              blue  <= 1'b1;
+            end
           end else begin
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b1;
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b01, row_cnt}] == 1'b1) begin
+              // upper half: lower left quadrant
+              red   <= 1'b1;
+              green <= 1'b0;
+              blue  <= 1'b0;
+            end
           end
         end
         LATCH: begin
@@ -108,11 +225,11 @@ module led_panel_single (
           // blank off, latch off
           blank     <= 1'b0;
           latch     <= 1'b1;
-          col_cnt <= 8'b0000000;
+          col_cnt <= 6'b00000;
         end
         PAUSE: begin
           // reuse col_cnt counter for delay
-          if (col_cnt == 8'b00000010) begin
+          if (col_cnt == 6'b000010) begin
             state <= NEXTROW;
           end else begin
             col_cnt <= col_cnt + 1;
@@ -120,8 +237,8 @@ module led_panel_single (
         end
         NEXTROW: begin
           state <= FIRSTCOL;
-          if (row_cnt[0] == 1'b1 && row_cnt[1] == 1'b1) begin // && row_cnt[2] == rowmax_in[0] && row_cnt[3] == rowmax_in[1] && row_cnt[4] == rowmax_in[2] && row_cnt[5] == rowmax_in[3]) begin
-            row_cnt <= 6'b000000;
+          if (row_cnt[0] == 2'b11) begin
+            row_cnt <= 2'b00;
             arst    <= 1'b1;
           end else begin
             row_cnt <= row_cnt + 1;

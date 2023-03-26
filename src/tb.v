@@ -24,6 +24,14 @@ module tb (
   initial begin
     $dumpfile ("tb.vcd");
     $dumpvars (0, tb);
+    $dumpvars (0, tb.top.frame_buffer[0]);
+    $dumpvars (0, tb.top.frame_buffer[1]);
+    $dumpvars (0, tb.top.frame_buffer[2]);
+    $dumpvars (0, tb.top.frame_buffer[3]);
+    $dumpvars (0, tb.top.frame_buffer[4]);
+    $dumpvars (0, tb.top.frame_buffer[5]);
+    $dumpvars (0, tb.top.frame_buffer[6]);
+    $dumpvars (0, tb.top.frame_buffer[7]);
     #1;
   end
 
@@ -45,6 +53,6 @@ module tb (
                        .arst_out(arst),    
                        .sclk_out(sclk),    
                        .latch_out(latch),  
-                       .rowmax_in(3'b000)
+                       .rowmax_in(4'b0000)
                        );              
 endmodule
