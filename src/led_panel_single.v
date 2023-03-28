@@ -87,16 +87,6 @@ module led_panel_single (
       frame_buffer[4'b1101] <= 4'b0;
       frame_buffer[4'b1110] <= 4'b0;
       frame_buffer[4'b1111] <= 4'b0;
-    end else begin
-      case(state)
-        FIRSTCOL: begin
-          state   <= CLOCK1;
-          // blank on, other off
-          blank   <= 1'b1;
-          latch   <= 1'b1;
-          arst    <= 1'b0;
-          aclk    <= 1'b0;
-          col_cnt <= 6'b011111;
           frame_buffer[0][0] <= 1'b1;
           frame_buffer[1][1] <= 1'b1;
           frame_buffer[2][2] <= 1'b1;
@@ -129,6 +119,32 @@ module led_panel_single (
           frame_buffer[2][13] <= 1'b1;
           frame_buffer[1][14] <= 1'b1;
           frame_buffer[0][15] <= 1'b1;
+    end else begin
+      case(state)
+        FIRSTCOL: begin
+          state   <= CLOCK1;
+          // blank on, other off
+          blank   <= 1'b1;
+          latch   <= 1'b1;
+          arst    <= 1'b0;
+          aclk    <= 1'b0;
+          col_cnt <= 6'b011111;
+          frame_buffer[0] <= frame_buffer[1];
+          frame_buffer[1] <= frame_buffer[2];
+          frame_buffer[2] <= frame_buffer[3];
+          frame_buffer[3] <= frame_buffer[4];
+          frame_buffer[4] <= frame_buffer[5];
+          frame_buffer[5] <= frame_buffer[6];
+          frame_buffer[6] <= frame_buffer[7];
+          frame_buffer[7] <= frame_buffer[8];
+          frame_buffer[8] <= frame_buffer[9];
+          frame_buffer[9] <= frame_buffer[10];
+          frame_buffer[10] <= frame_buffer[11];
+          frame_buffer[11] <= frame_buffer[12];
+          frame_buffer[12] <= frame_buffer[13];
+          frame_buffer[13] <= frame_buffer[14];
+          frame_buffer[14] <= frame_buffer[15];
+          frame_buffer[15] <= frame_buffer[0];
         end
         CLOCK1: begin
           if (col_cnt[5] == 1'b1) begin
