@@ -53,7 +53,7 @@ module led_panel_single (
   localparam       PAUSE = 3'b101;
   localparam       NEXTROW = 3'b110;
 
-  reg [15:0]  frame_buffer [15:0];
+  reg [7:0] frame_buffer [15:0];
   wire [3:0] frame_column;
   wire [3:0] frame_row;
 
@@ -71,22 +71,22 @@ module led_panel_single (
       row_cnt <= 2'b00;
       arst    <= 1'b1;
       aclk    <= 1'b0;
-      frame_buffer[0] <= 4'b0;
-      frame_buffer[1] <= 4'b0;
-      frame_buffer[2] <= 4'b0;
-      frame_buffer[3] <= 4'b0;
-      frame_buffer[4] <= 4'b0;
-      frame_buffer[5] <= 4'b0;
-      frame_buffer[6] <= 4'b0;
-      frame_buffer[7] <= 4'b0;
-      frame_buffer[8] <= 4'b0;
-      frame_buffer[9] <= 4'b0;
-      frame_buffer[10] <= 4'b0;
-      frame_buffer[11] <= 4'b0;
-      frame_buffer[12] <= 4'b0;
-      frame_buffer[13] <= 4'b0;
-      frame_buffer[14] <= 4'b0;
-      frame_buffer[15] <= 4'b0;
+      frame_buffer[0] <= 3'b0;
+      frame_buffer[1] <= 3'b0;
+      frame_buffer[2] <= 3'b0;
+      frame_buffer[3] <= 3'b0;
+      frame_buffer[4] <= 3'b0;
+      frame_buffer[5] <= 3'b0;
+      frame_buffer[6] <= 3'b0;
+      frame_buffer[7] <= 3'b0;
+      frame_buffer[8] <= 3'b0;
+      frame_buffer[9] <= 3'b0;
+      frame_buffer[10] <= 3'b0;
+      frame_buffer[11] <= 3'b0;
+      frame_buffer[12] <= 3'b0;
+      frame_buffer[13] <= 3'b0;
+      frame_buffer[14] <= 3'b0;
+      frame_buffer[15] <= 3'b0;
     end else begin
       case(state)
         FIRSTCOL: begin
@@ -97,54 +97,41 @@ module led_panel_single (
           arst    <= 1'b0;
           aclk    <= 1'b0;
           col_cnt <= 6'b011111;
-      frame_buffer[0]  <= frame_buffer[0]  + 1;
-      frame_buffer[1]  <= frame_buffer[1]  + 1;
-      frame_buffer[2]  <= frame_buffer[2]  + 1;
-      frame_buffer[3]  <= frame_buffer[3]  + 1;
-      frame_buffer[4]  <= frame_buffer[4]  + 1;
-      frame_buffer[5]  <= frame_buffer[5]  + 1;
-      frame_buffer[6]  <= frame_buffer[6]  + 1;
-      frame_buffer[7]  <= frame_buffer[7]  + 1;
-      frame_buffer[8]  <= frame_buffer[8]  + 1;
-      frame_buffer[9]  <= frame_buffer[9]  + 1;
-      frame_buffer[10] <= frame_buffer[10] + 1;
-      frame_buffer[11] <= frame_buffer[11] + 1;
-      frame_buffer[12] <= frame_buffer[12] + 1;
-      frame_buffer[13] <= frame_buffer[13] + 1;
-      frame_buffer[14] <= frame_buffer[14] + 1;
-      frame_buffer[15] <= frame_buffer[15] + 1;
-//           frame_buffer[0][0] <= 1'b1;
-//           frame_buffer[1][1] <= 1'b1;
-//           frame_buffer[2][2] <= 1'b1;
-//           frame_buffer[3][3] <= 1'b1;
-//           frame_buffer[4][4] <= 1'b1;
-//           frame_buffer[5][5] <= 1'b1;
-//           frame_buffer[6][6] <= 1'b1;
-//           frame_buffer[7][7] <= 1'b1;
-//           frame_buffer[8][8] <= 1'b1;
-//           frame_buffer[9][9] <= 1'b1;
-//           frame_buffer[10][10] <= 1'b1;
-//           frame_buffer[11][11] <= 1'b1;
-//           frame_buffer[12][12] <= 1'b1;
-//           frame_buffer[13][13] <= 1'b1;
-//           frame_buffer[14][14] <= 1'b1;
-//           frame_buffer[15][15] <= 1'b1;
-//           frame_buffer[15][0] <= 1'b1;
-//           frame_buffer[14][1] <= 1'b1;
-//           frame_buffer[13][2] <= 1'b1;
-//           frame_buffer[12][3] <= 1'b1;
-//           frame_buffer[11][4] <= 1'b1;
-//           frame_buffer[10][5] <= 1'b1;
-//           frame_buffer[9][6] <= 1'b1;
-//           frame_buffer[8][7] <= 1'b1;
-//           frame_buffer[7][8] <= 1'b1;
-//           frame_buffer[6][9] <= 1'b1;
-//           frame_buffer[5][10] <= 1'b1;
-//           frame_buffer[4][11] <= 1'b1;
-//           frame_buffer[3][12] <= 1'b1;
-//           frame_buffer[2][13] <= 1'b1;
-//           frame_buffer[1][14] <= 1'b1;
-//           frame_buffer[0][15] <= 1'b1;
+          frame_buffer[0][0] <= 1'b1;
+          frame_buffer[1][1] <= 1'b1;
+          frame_buffer[2][2] <= 1'b1;
+          frame_buffer[3][3] <= 1'b1;
+          frame_buffer[4][4] <= 1'b1;
+          frame_buffer[5][5] <= 1'b1;
+          frame_buffer[6][6] <= 1'b1;
+          frame_buffer[7][7] <= 1'b1;
+
+          frame_buffer[0][7] <= 1'b1; 
+          frame_buffer[1][6] <= 1'b1;
+          frame_buffer[2][5] <= 1'b1;
+          frame_buffer[3][4] <= 1'b1;
+          frame_buffer[4][3] <= 1'b1;
+          frame_buffer[5][2] <= 1'b1;
+          frame_buffer[6][1] <= 1'b1;
+          frame_buffer[7][0] <= 1'b1;
+
+          frame_buffer[8+0][0] <= 1'b1;
+          frame_buffer[8+1][1] <= 1'b1;
+          frame_buffer[8+2][2] <= 1'b1;
+          frame_buffer[8+3][3] <= 1'b1;
+          frame_buffer[8+4][4] <= 1'b1;
+          frame_buffer[8+5][5] <= 1'b1;
+          frame_buffer[8+6][6] <= 1'b1;
+          frame_buffer[8+7][7] <= 1'b1;
+
+          frame_buffer[8+0][7] <= 1'b1; 
+          frame_buffer[8+1][6] <= 1'b1;
+          frame_buffer[8+2][5] <= 1'b1;
+          frame_buffer[8+3][4] <= 1'b1;
+          frame_buffer[8+4][3] <= 1'b1;
+          frame_buffer[8+5][2] <= 1'b1;
+          frame_buffer[8+6][1] <= 1'b1;
+          frame_buffer[8+7][0] <= 1'b1;
         end
         CLOCK1: begin
           if (col_cnt[5] == 1'b1) begin
@@ -160,33 +147,29 @@ module led_panel_single (
           blue  <= 1'b0;
           // lower half data on falling edge
           if (col_cnt < 8) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b10, row_cnt}] == 1'b1) begin
-              // upper half: upper right quadrant
-              red   <= 1'b1;
-              green <= 1'b1;
-              blue  <= 1'b1;
-            end
-          end else if (col_cnt < 16) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b11, row_cnt}] == 1'b1) begin
-            // upper half: lower right quadrant
-              red   <= 1'b1;
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
+              // lower half: upper right quadrant
+              red   <= 1'b0;
               green <= 1'b0;
               blue  <= 1'b1;
             end
+          end else if (col_cnt < 16) begin
+            // lower half: lower right quadrant
+            red   <= 1'b0;
+            green <= 1'b0;
+            blue  <= 1'b0;
           end else if (col_cnt < 24) begin
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b10, row_cnt}] == 1'b1) begin
-            // upper half: upper left quadrant
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
+            // lower half: upper left quadrant
               red   <= 1'b1;
               green <= 1'b1;
               blue  <= 1'b1;
             end
           end else begin 
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b11, row_cnt}] == 1'b1) begin
-              // upper half: lower left quadrant
-              red   <= 1'b1;
-              green <= 1'b1;
-              blue  <= 1'b0;
-            end
+            // lower half: lower left quadrant
+            red   <= 1'b0;
+            green <= 1'b0;
+            blue  <= 1'b0;
           end
         end
         CLOCK2: begin
@@ -200,31 +183,27 @@ module led_panel_single (
           blue  <= 1'b0;
           // upper half data on rising edge
           if (col_cnt < 8) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b00, row_cnt}] == 1'b1) begin
-              // upper half: upper right quadrant
-              red   <= 1'b0;
-              green <= 1'b0;
-              blue  <= 1'b1;
-            end
+            // upper half: upper right quadrant
+            red   <= 1'b0;
+            green <= 1'b0;
+            blue  <= 1'b0;
           end else if (col_cnt < 16) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{2'b01, row_cnt}] == 1'b1) begin
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
             // upper half: lower right quadrant
-              red   <= 1'b0;
-              green <= 1'b1;
+              red   <= 1'b1;
+              green <= 1'b0;
               blue  <= 1'b0;
             end
           end else if (col_cnt < 24) begin
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b00, row_cnt}] == 1'b1) begin
             // upper half: upper left quadrant
+            red   <= 1'b0;
+            green <= 1'b0;
+            blue  <= 1'b0;
+          end else begin
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
+              // upper half: lower left quadrant
               red   <= 1'b0;
               green <= 1'b1;
-              blue  <= 1'b1;
-            end
-          end else begin
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{2'b01, row_cnt}] == 1'b1) begin
-              // upper half: lower left quadrant
-              red   <= 1'b1;
-              green <= 1'b0;
               blue  <= 1'b0;
             end
           end
