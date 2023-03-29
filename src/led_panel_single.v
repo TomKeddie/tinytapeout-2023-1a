@@ -87,16 +87,6 @@ module led_panel_single (
       frame_buffer[13] <= 3'b0;
       frame_buffer[14] <= 3'b0;
       frame_buffer[15] <= 3'b0;
-    end else begin
-      case(state)
-        FIRSTCOL: begin
-          state   <= CLOCK1;
-          // blank on, other off
-          blank   <= 1'b1;
-          latch   <= 1'b1;
-          arst    <= 1'b0;
-          aclk    <= 1'b0;
-          col_cnt <= 6'b011111;
           frame_buffer[0][0] <= 1'b1;
           frame_buffer[1][1] <= 1'b1;
           frame_buffer[2][2] <= 1'b1;
@@ -132,6 +122,16 @@ module led_panel_single (
           frame_buffer[8+5][2] <= 1'b1;
           frame_buffer[8+6][1] <= 1'b1;
           frame_buffer[8+7][0] <= 1'b1;
+    end else begin
+      case(state)
+        FIRSTCOL: begin
+          state   <= CLOCK1;
+          // blank on, other off
+          blank   <= 1'b1;
+          latch   <= 1'b1;
+          arst    <= 1'b0;
+          aclk    <= 1'b0;
+          col_cnt <= 6'b011111;
         end
         CLOCK1: begin
           if (col_cnt[5] == 1'b1) begin
@@ -232,9 +232,25 @@ module led_panel_single (
         end
         NEXTROW: begin
           state <= FIRSTCOL;
-          if (row_cnt[0] == 2'b11) begin
+          if (row_cnt == 2'b11) begin
             row_cnt <= 2'b00;
             arst    <= 1'b1;
+            frame_buffer[0] <= {frame_buffer[0][0], frame_buffer[0][7:1]};
+            frame_buffer[1] <= {frame_buffer[1][0], frame_buffer[1][7:1]};
+            frame_buffer[2] <= {frame_buffer[2][0], frame_buffer[2][7:1]};
+            frame_buffer[3] <= {frame_buffer[3][0], frame_buffer[3][7:1]};
+            frame_buffer[4] <= {frame_buffer[4][0], frame_buffer[4][7:1]};
+            frame_buffer[5] <= {frame_buffer[5][0], frame_buffer[5][7:1]};
+            frame_buffer[6] <= {frame_buffer[6][0], frame_buffer[6][7:1]};
+            frame_buffer[7] <= {frame_buffer[7][0], frame_buffer[7][7:1]};
+            frame_buffer[8+0] <= {frame_buffer[8+0][0], frame_buffer[8+0][7:1]};
+            frame_buffer[8+1] <= {frame_buffer[8+1][0], frame_buffer[8+1][7:1]};
+            frame_buffer[8+2] <= {frame_buffer[8+2][0], frame_buffer[8+2][7:1]};
+            frame_buffer[8+3] <= {frame_buffer[8+3][0], frame_buffer[8+3][7:1]};
+            frame_buffer[8+4] <= {frame_buffer[8+4][0], frame_buffer[8+4][7:1]};
+            frame_buffer[8+5] <= {frame_buffer[8+5][0], frame_buffer[8+5][7:1]};
+            frame_buffer[8+6] <= {frame_buffer[8+6][0], frame_buffer[8+6][7:1]};
+            frame_buffer[8+7] <= {frame_buffer[8+7][0], frame_buffer[8+7][7:1]};
           end else begin
             row_cnt <= row_cnt + 1;
             aclk <= 1'b1;
