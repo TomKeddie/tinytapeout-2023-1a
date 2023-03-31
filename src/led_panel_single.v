@@ -17,17 +17,17 @@
 // BA=11 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
 
 module led_panel_single (
-	                     input       clk,
-                         input       reset,
-                         output      red_out,
-                         output      blue_out,
-                         output      aclk_out,
-                         output      blank_out,
-                         output      green_out,
-                         output      arst_out,
-                         output      sclk_out,
-                         output      latch_out,
-                         input [3:0] rowmax_in
+	                     input  clk,
+                         input  reset,
+                         input  uart_rx,
+                         output red_out,
+                         output blue_out,
+                         output aclk_out,
+                         output blank_out,
+                         output green_out,
+                         output arst_out,
+                         output sclk_out,
+                         output latch_out
                          );
 
   // column
@@ -57,6 +57,9 @@ module led_panel_single (
   reg [7:0] frame_buffer_1 [15:0];
   wire [3:0] frame_column;
   wire [3:0] frame_row;
+
+  wire       uart_received;
+  wire [7:0] uart_rx_byte;
 
   // Columns
   always @(posedge clk) begin
@@ -276,6 +279,10 @@ module led_panel_single (
       endcase
     end
   end
+
+
+  uart uart(.clk(clk), .rst(reset), .rx(uart_rx), .received(uart_received), .rx_byte(uart_rx_byte));
+
   
   assign red_out = red;
   assign blue_out = blue;
