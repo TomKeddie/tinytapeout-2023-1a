@@ -25,11 +25,17 @@ module uart(
     input clk, // The master clock for this module
     input rst, // Synchronous reset.
     input rx, // Incoming serial line
+    output tx, // Outgoing serial line
+    input transmit, // Signal to transmit
+    input [7:0] tx_byte, // Byte to transmit
     output received, // Indicated that a byte has been received.
-    output [7:0] rx_byte // Byte received
+    output [7:0] rx_byte, // Byte received
+    output is_receiving, // Low when receive line is idle.
+    output is_transmitting, // Low when transmit line is idle.
+    output recv_error // Indicates error in receiving packet.
     );
 
-parameter CLOCK_DIVIDE = 5; // clock rate (6kHhz) / (baud rate (300) * 4)
+parameter CLOCK_DIVIDE = 1302; // clock rate (50Mhz) / (baud rate (9600) * 4)
 
 // States for the receiving state machine.
 // These are just constants, not parameters to override.
@@ -41,20 +47,38 @@ parameter RX_DELAY_RESTART = 4;
 parameter RX_ERROR = 5;
 parameter RX_RECEIVED = 6;
 
-reg [2:0] rx_clk_divider = CLOCK_DIVIDE;
+// States for the transmitting state machine.
+// Constants - do not override.
+parameter TX_IDLE = 0;
+parameter TX_SENDING = 1;
+parameter TX_DELAY_RESTART = 2;
+
+reg [10:0] rx_clk_divider = CLOCK_DIVIDE;
+reg [10:0] tx_clk_divider = CLOCK_DIVIDE;
 
 reg [2:0] recv_state = RX_IDLE;
 reg [5:0] rx_countdown;
 reg [3:0] rx_bits_remaining;
 reg [7:0] rx_data;
 
+reg tx_out = 1'b1;
+reg [1:0] tx_state = TX_IDLE;
+reg [5:0] tx_countdown;
+reg [3:0] tx_bits_remaining;
+reg [7:0] tx_data;
 
 assign received = recv_state == RX_RECEIVED;
+assign recv_error = recv_state == RX_ERROR;
+assign is_receiving = recv_state != RX_IDLE;
 assign rx_byte = rx_data;
+
+assign tx = tx_out;
+assign is_transmitting = tx_state != TX_IDLE;
 
 always @(posedge clk) begin
 	if (rst) begin
 		recv_state = RX_IDLE;
+		tx_state = TX_IDLE;
 	end
 	
 	// The clk_divider counter counts down from
@@ -66,6 +90,11 @@ always @(posedge clk) begin
 	if (!rx_clk_divider) begin
 		rx_clk_divider = CLOCK_DIVIDE;
 		rx_countdown = rx_countdown - 1;
+	end
+	tx_clk_divider = tx_clk_divider - 1;
+	if (!tx_clk_divider) begin
+		tx_clk_divider = CLOCK_DIVIDE;
+		tx_countdown = tx_countdown - 1;
 	end
 	
 	// Receive state machine
@@ -136,6 +165,47 @@ always @(posedge clk) begin
 			// Raises the received flag for one clock
 			// cycle while in this state.
 			recv_state = RX_IDLE;
+		end
+	endcase
+	
+	// Transmit state machine
+	case (tx_state)
+		TX_IDLE: begin
+			if (transmit) begin
+				// If the transmit flag is raised in the idle
+				// state, start transmitting the current content
+				// of the tx_byte input.
+				tx_data = tx_byte;
+				// Send the initial, low pulse of 1 bit period
+				// to signal the start, followed by the data
+				tx_clk_divider = CLOCK_DIVIDE;
+				tx_countdown = 4;
+				tx_out = 0;
+				tx_bits_remaining = 8;
+				tx_state = TX_SENDING;
+			end
+		end
+		TX_SENDING: begin
+			if (!tx_countdown) begin
+				if (tx_bits_remaining) begin
+					tx_bits_remaining = tx_bits_remaining - 1;
+					tx_out = tx_data[0];
+					tx_data = {1'b0, tx_data[7:1]};
+					tx_countdown = 4;
+					tx_state = TX_SENDING;
+				end else begin
+					// Set delay to send out 2 stop bits.
+					tx_out = 1;
+					tx_countdown = 8;
+					tx_state = TX_DELAY_RESTART;
+				end
+			end
+		end
+		TX_DELAY_RESTART: begin
+			// Wait until tx_countdown reaches the end before
+			// we send another transmission. This covers the
+			// "stop bit" delay.
+			tx_state = tx_countdown ? TX_DELAY_RESTART : TX_IDLE;
 		end
 	endcase
 end

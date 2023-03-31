@@ -4,7 +4,7 @@ PIN_DEF = icebreaker-examples/icebreaker/icebreaker.pcf
 DEVICE = up5k
 PACKAGE = sg48
 
-ADD_SRC = led_panel_single.v uart.v
+ADD_SRC = led_panel_single.v
 
 prog: iceprog
 
