@@ -52,7 +52,6 @@ module tb (
                        .green_out(green),  
                        .arst_out(arst),    
                        .sclk_out(sclk),    
-                       .latch_out(latch),  
-                       .rowmax_in(4'b0000)
+                       .latch_out(latch) 
                        );              
 endmodule
