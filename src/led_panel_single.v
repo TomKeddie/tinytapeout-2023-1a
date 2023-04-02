@@ -72,7 +72,7 @@ module led_panel_single (
       row_cnt              <= 2'b00;
       arst                 <= 1'b1;
       aclk                 <= 1'b0;
-      rgb                  <= 3'b100;
+      rgb                  <= 3'b101;
 
       frame_buffer[0]      <= 3'b0;
       frame_buffer[1]      <= 3'b0;

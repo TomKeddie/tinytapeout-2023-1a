@@ -30,9 +30,6 @@ module tomkeddie_top_tto_a
 
   assign clk       = io_in[0];
   assign rst       = io_in[1];
-  assign rowmax[0] = io_in[5];
-  assign rowmax[1] = io_in[6];
-  assign rowmax[2] = io_in[7];
 
   // instantiate the component
   led_panel_single top(.clk(clk),
@@ -44,8 +41,7 @@ module tomkeddie_top_tto_a
                        .green_out(green),  
                        .arst_out(arst),    
                        .sclk_out(sclk),    
-                       .latch_out(latch),  
-                       .rowmax_in(rowmax)
+                       .latch_out(latch)
                        );              
   
 endmodule
