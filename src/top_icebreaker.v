@@ -34,7 +34,6 @@ module top
   wire    arst;
   wire    sclk;
   wire    latch;
-  wire [3:0]   rowmax;
   
   reg [15:0] clk_divide_counter;
   reg [15:0]   rst_delay_counter;
@@ -60,10 +59,6 @@ module top
   assign P1B8 = arst;
   assign P1B9 = sclk;
   assign P1B10 = latch;
-  assign rowmax[0] = P1A1;
-  assign rowmax[1] = P1A2;
-  assign rowmax[2] = P1A3;
-  assign rowmax[3] = P1A4;
     
   // clock divider
   always @(posedge CLK) begin
@@ -105,8 +100,7 @@ module top
                        .green_out(green),
                        .arst_out(arst),
                        .sclk_out(sclk),
-                       .latch_out(latch),
-                       .rowmax_in(rowmax)
+                       .latch_out(latch)
                        );              
 
 endmodule

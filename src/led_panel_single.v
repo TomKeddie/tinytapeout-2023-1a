@@ -60,71 +60,110 @@ module led_panel_single (
   wire       uart_received;
   wire [7:0] uart_rx_byte;
 
+  wire [2:0] rgb;
+
   // Columns
   always @(posedge clk) begin
     if (reset == 1'b1) begin
-      state   <= FIRSTCOL;
-      red     <= 1'b0;
-      green   <= 1'b0;
-      blue    <= 1'b0;
-      blank   <= 1'b1;
-      latch   <= 1'b1;
-      sclk    <= 1'b1;
-      col_cnt <= 6'b000000;
-      row_cnt <= 2'b00;
-      arst    <= 1'b1;
-      aclk    <= 1'b0;
-      frame_buffer[0] <= 3'b0;
-      frame_buffer[1] <= 3'b0;
-      frame_buffer[2] <= 3'b0;
-      frame_buffer[3] <= 3'b0;
-      frame_buffer[4] <= 3'b0;
-      frame_buffer[5] <= 3'b0;
-      frame_buffer[6] <= 3'b0;
-      frame_buffer[7] <= 3'b0;
-      frame_buffer[8] <= 3'b0;
-      frame_buffer[9] <= 3'b0;
-      frame_buffer[10] <= 3'b0;
-      frame_buffer[11] <= 3'b0;
-      frame_buffer[12] <= 3'b0;
-      frame_buffer[13] <= 3'b0;
-      frame_buffer[14] <= 3'b0;
-      frame_buffer[15] <= 3'b0;
-          frame_buffer[0][0] <= 1'b1;
-          frame_buffer[1][1] <= 1'b1;
-          frame_buffer[2][2] <= 1'b1;
-          frame_buffer[3][3] <= 1'b1;
-          frame_buffer[4][4] <= 1'b1;
-          frame_buffer[5][5] <= 1'b1;
-          frame_buffer[6][6] <= 1'b1;
-          frame_buffer[7][7] <= 1'b1;
-
-          frame_buffer[0][7] <= 1'b1; 
-          frame_buffer[1][6] <= 1'b1;
-          frame_buffer[2][5] <= 1'b1;
-          frame_buffer[3][4] <= 1'b1;
-          frame_buffer[4][3] <= 1'b1;
-          frame_buffer[5][2] <= 1'b1;
-          frame_buffer[6][1] <= 1'b1;
-          frame_buffer[7][0] <= 1'b1;
-
-          frame_buffer[8+0][0] <= 1'b1;
-          frame_buffer[8+1][1] <= 1'b1;
-          frame_buffer[8+2][2] <= 1'b1;
-          frame_buffer[8+3][3] <= 1'b1;
-          frame_buffer[8+4][4] <= 1'b1;
-          frame_buffer[8+5][5] <= 1'b1;
-          frame_buffer[8+6][6] <= 1'b1;
-          frame_buffer[8+7][7] <= 1'b1;
-
-          frame_buffer[8+0][7] <= 1'b1; 
-          frame_buffer[8+1][6] <= 1'b1;
-          frame_buffer[8+2][5] <= 1'b1;
-          frame_buffer[8+3][4] <= 1'b1;
-          frame_buffer[8+4][3] <= 1'b1;
-          frame_buffer[8+5][2] <= 1'b1;
-          frame_buffer[8+6][1] <= 1'b1;
-          frame_buffer[8+7][0] <= 1'b1;
+      state               <= FIRSTCOL;
+      red                 <= 1'b0;
+      green               <= 1'b0;
+      blue                <= 1'b0;
+      blank               <= 1'b1;
+      latch               <= 1'b1;
+      sclk                <= 1'b1;
+      col_cnt             <= 6'b000000;
+      row_cnt             <= 2'b00;
+      arst                <= 1'b1;
+      aclk                <= 1'b0;
+      frame_buffer[0]     <= 3'b0;
+      frame_buffer[1]     <= 3'b0;
+      frame_buffer[2]     <= 3'b0;
+      frame_buffer[3]     <= 3'b0;
+      frame_buffer[4]     <= 3'b0;
+      frame_buffer[5]     <= 3'b0;
+      frame_buffer[6]     <= 3'b0;
+      frame_buffer[7]     <= 3'b0;
+      frame_buffer[8]     <= 3'b0;
+      frame_buffer[9]     <= 3'b0;
+      frame_buffer[10]    <= 3'b0;
+      frame_buffer[11]    <= 3'b0;
+      frame_buffer[12]    <= 3'b0;
+      frame_buffer[13]    <= 3'b0;
+      frame_buffer[14]    <= 3'b0;
+      frame_buffer[15]    <= 3'b0;
+      // T
+      frame_buffer[15][0] <= 1'b1;
+      frame_buffer[14][0] <= 1'b1;
+      frame_buffer[13][0] <= 1'b1;
+      frame_buffer[14][1] <= 1'b1;
+      frame_buffer[14][2] <= 1'b1;
+      frame_buffer[14][3] <= 1'b1;
+      frame_buffer[14][4] <= 1'b1;
+      // T
+      frame_buffer[11][0] <= 1'b1;
+      frame_buffer[10][0] <= 1'b1;
+      frame_buffer[09][0] <= 1'b1;
+      frame_buffer[10][1] <= 1'b1;
+      frame_buffer[10][2] <= 1'b1;
+      frame_buffer[10][3] <= 1'b1;
+      frame_buffer[10][4] <= 1'b1;
+      // 0
+      frame_buffer[6][0]  <= 1'b1;
+      frame_buffer[5][1]  <= 1'b1;
+      frame_buffer[7][1]  <= 1'b1;
+      frame_buffer[5][2]  <= 1'b1;
+      frame_buffer[7][2]  <= 1'b1;
+      frame_buffer[5][3]  <= 1'b1;
+      frame_buffer[7][3]  <= 1'b1;
+      frame_buffer[6][4]  <= 1'b1;
+      // 3
+      frame_buffer[3][0]  <= 1'b1;
+      frame_buffer[2][0]  <= 1'b1;
+      frame_buffer[1][1]  <= 1'b1;
+      frame_buffer[3][2]  <= 1'b1;
+      frame_buffer[2][2]  <= 1'b1;
+      frame_buffer[1][3]  <= 1'b1;
+      frame_buffer[3][4]  <= 1'b1;
+      frame_buffer[2][4]  <= 1'b1;
+      
+      
+//       frame_buffer[0][0] <= 1'b1;
+//       frame_buffer[1][1] <= 1'b1;
+//       frame_buffer[2][2] <= 1'b1;
+//       frame_buffer[3][3] <= 1'b1;
+//          frame_buffer[4][4] <= 1'b1;
+//           frame_buffer[5][5] <= 1'b1;
+//           frame_buffer[6][6] <= 1'b1;
+//           frame_buffer[7][7] <= 1'b1;
+// 
+//           frame_buffer[0][7] <= 1'b1; 
+//           frame_buffer[1][6] <= 1'b1;
+//           frame_buffer[2][5] <= 1'b1;
+//           frame_buffer[3][4] <= 1'b1;
+//           frame_buffer[4][3] <= 1'b1;
+//           frame_buffer[5][2] <= 1'b1;
+//           frame_buffer[6][1] <= 1'b1;
+//           frame_buffer[7][0] <= 1'b1;
+// 
+//           frame_buffer[8+0][0] <= 1'b1;
+//           frame_buffer[8+1][1] <= 1'b1;
+//           frame_buffer[8+2][2] <= 1'b1;
+//           frame_buffer[8+3][3] <= 1'b1;
+//           frame_buffer[8+4][4] <= 1'b1;
+//           frame_buffer[8+5][5] <= 1'b1;
+//           frame_buffer[8+6][6] <= 1'b1;
+//           frame_buffer[8+7][7] <= 1'b1;
+// 
+//           frame_buffer[8+0][7] <= 1'b1; 
+//           frame_buffer[8+1][6] <= 1'b1;
+//           frame_buffer[8+2][5] <= 1'b1;
+//           frame_buffer[8+3][4] <= 1'b1;
+//           frame_buffer[8+4][3] <= 1'b1;
+//           frame_buffer[8+5][2] <= 1'b1;
+//           frame_buffer[8+6][1] <= 1'b1;
+//           frame_buffer[8+7][0] <= 1'b1;
+      rgb <= 3'b011;
     end else begin
       case(state)
         FIRSTCOL: begin
@@ -150,29 +189,19 @@ module led_panel_single (
           blue  <= 1'b0;
           // lower half data on falling edge
           if (col_cnt < 8) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
-              // lower half: upper right quadrant
-              red   <= 1'b0;
-              green <= 1'b0;
-              blue  <= 1'b1;
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
+            // lower half: upper right quadrant
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
             end
-          end else if (col_cnt < 16) begin
-            // lower half: lower right quadrant
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
-          end else if (col_cnt < 24) begin
+          end else if (col_cnt > 15 && col_cnt < 24) begin
             if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
             // lower half: upper left quadrant
-              red   <= 1'b1;
-              green <= 1'b1;
-              blue  <= 1'b1;
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
             end
-          end else begin 
-            // lower half: lower left quadrant
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
           end
         end
         CLOCK2: begin
@@ -186,28 +215,32 @@ module led_panel_single (
           blue  <= 1'b0;
           // upper half data on rising edge
           if (col_cnt < 8) begin
-            // upper half: upper right quadrant
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
+              // upper half: upper right quadrant
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
+            end
           end else if (col_cnt < 16) begin
             if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
             // upper half: lower right quadrant
-              red   <= 1'b1;
-              green <= 1'b0;
-              blue  <= 1'b0;
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
             end
           end else if (col_cnt < 24) begin
-            // upper half: upper left quadrant
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
+              // upper half: upper left quadrant
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
+            end
           end else begin
             if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
               // upper half: lower left quadrant
-              red   <= 1'b0;
-              green <= 1'b1;
-              blue  <= 1'b0;
+              red   <= rgb[0];
+              green <= rgb[1];
+              blue  <= rgb[2];
             end
           end
         end
@@ -215,8 +248,6 @@ module led_panel_single (
           state             <= UNBLANK;
           // latch on
           latch                 <= 1'b0;
-          // blank here is brighter but much more flicker
-          // blank     <= 1'b1;
         end
         UNBLANK: begin
           state <= PAUSE;
@@ -238,22 +269,6 @@ module led_panel_single (
           if (row_cnt == 2'b11) begin
             row_cnt <= 2'b00;
             arst    <= 1'b1;
-            frame_buffer[0] <= {frame_buffer[0][0], frame_buffer[0][7:1]};
-            frame_buffer[1] <= {frame_buffer[1][0], frame_buffer[1][7:1]};
-            frame_buffer[2] <= {frame_buffer[2][0], frame_buffer[2][7:1]};
-            frame_buffer[3] <= {frame_buffer[3][0], frame_buffer[3][7:1]};
-            frame_buffer[4] <= {frame_buffer[4][0], frame_buffer[4][7:1]};
-            frame_buffer[5] <= {frame_buffer[5][0], frame_buffer[5][7:1]};
-            frame_buffer[6] <= {frame_buffer[6][0], frame_buffer[6][7:1]};
-            frame_buffer[7] <= {frame_buffer[7][0], frame_buffer[7][7:1]};
-            frame_buffer[8+0] <= {frame_buffer[8+0][0], frame_buffer[8+0][7:1]};
-            frame_buffer[8+1] <= {frame_buffer[8+1][0], frame_buffer[8+1][7:1]};
-            frame_buffer[8+2] <= {frame_buffer[8+2][0], frame_buffer[8+2][7:1]};
-            frame_buffer[8+3] <= {frame_buffer[8+3][0], frame_buffer[8+3][7:1]};
-            frame_buffer[8+4] <= {frame_buffer[8+4][0], frame_buffer[8+4][7:1]};
-            frame_buffer[8+5] <= {frame_buffer[8+5][0], frame_buffer[8+5][7:1]};
-            frame_buffer[8+6] <= {frame_buffer[8+6][0], frame_buffer[8+6][7:1]};
-            frame_buffer[8+7] <= {frame_buffer[8+7][0], frame_buffer[8+7][7:1]};
           end else begin
             row_cnt <= row_cnt + 1;
             aclk <= 1'b1;
