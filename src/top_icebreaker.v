@@ -66,14 +66,6 @@ module top
   assign P1A8  = uart_rx_data[5];
   assign P1A9  = uart_rx_data[6];
   assign P1A10 = uart_rx_data[7];
-  assign P1B1 = red;
-  assign P1B2 = blue;
-  assign P1B3 = aclk;
-  assign P1B4 = blank;
-  assign P1B7 = green;
-  assign P1B8 = arst;
-  assign P1B9 = sclk;
-  assign P1B10 = latch;
 
   // clock divider
   always @(posedge CLK) begin
