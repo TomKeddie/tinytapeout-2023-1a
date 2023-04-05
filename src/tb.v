@@ -8,16 +8,19 @@
 
 module tb (
            // testbench is controlled by test.py
-	        input  clk,
-            input  reset,
-            output red,
-            output blue,
-            output aclk,
-            output blank,
-            output green,
-            output arst,
-            output sclk,
-            output latch
+	        input       clk,
+            input       reset,
+            input       uart_tx_dv,
+            input [7:0] uart_tx_data,
+            output      red,
+            output      blue,
+            output      aclk,
+            output      blank,
+            output      green,
+            output      arst,
+            output      sclk,
+            output      latch,
+            output      uart_tx_done
            );
 
   // this part dumps the trace to a vcd file that can be viewed with GTKWave
@@ -36,11 +39,7 @@ module tb (
   end
 
   // wire up the inputs and outputs
-  wire uart_tx_pin;
-
-  wire [3:0] lcd_data;
-  wire       lcd_en;
-  wire       lcd_rs;
+  wire uart_data;
 
   // instantiate the DUT
   led_panel_single top(.clk(clk),
@@ -52,6 +51,14 @@ module tb (
                        .green_out(green),  
                        .arst_out(arst),    
                        .sclk_out(sclk),    
-                       .latch_out(latch) 
-                       );              
+                       .latch_out(latch),
+                       .uart_data(uart_data)
+                       );
+
+  // 6000/300 = 20
+  uart_tx uart_tx(.i_Clock(clk),
+                  .i_Tx_DV(uart_tx_dv),
+                  .i_Tx_Byte(uart_tx_data),
+                  .o_Tx_Serial(uart_data),
+                  .o_Tx_Done(uart_tx_done));
 endmodule

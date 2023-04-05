@@ -10,7 +10,29 @@ async def top(dut):
     
     dut._log.info("reset")
     dut.reset.value = 1
+    dut.uart_tx_dv.value = 0
     await ClockCycles(dut.clk, 10)
     dut.reset.value = 0
 
-    await ClockCycles(dut.clk, 100000)
+    await ClockCycles(dut.clk, 10)
+    dut.uart_tx_data.value = 0xF5
+    dut.uart_tx_dv.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.uart_tx_dv.value = 0
+    await FallingEdge(dut.uart_tx_done)
+    dut.uart_tx_dv.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.uart_tx_dv.value = 0
+    await FallingEdge(dut.uart_tx_done)
+    dut.uart_tx_dv.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.uart_tx_dv.value = 0
+    await FallingEdge(dut.uart_tx_done)
+    dut.uart_tx_data.value = 0x07
+    dut.uart_tx_dv.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.uart_tx_dv.value = 0
+    await FallingEdge(dut.uart_tx_done)
+    
+
+    await ClockCycles(dut.clk, 10000)

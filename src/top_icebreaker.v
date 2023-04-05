@@ -11,11 +11,15 @@ module top
    output P2_8,
    output P2_9,
    output P2_10,
-   input  P1A1,
-   input  P1A2,
-   input  P1A3,
-   input  P1A4,
-   output P1B1,
+   output P1A1,
+   output P1A2,
+   output P1A3,
+   output P1A4,
+   output P1A7,
+   output P1A8,
+   output P1A9,
+   output P1A10,
+   input  P1B1,
    output P1B2,
    output P1B3,
    output P1B4,
@@ -26,7 +30,7 @@ module top
    );
 
   reg     clk_dut;
-  wire    red; 
+  wire    red;
   wire    blue;
   wire    aclk;
   wire    blank;
@@ -34,12 +38,15 @@ module top
   wire    arst;
   wire    sclk;
   wire    latch;
-  
+
   reg [15:0] clk_divide_counter;
   reg [15:0]   rst_delay_counter;
   wire         rst;
   wire         unused;
   reg          rst_delayed;
+
+  wire         uart_data;
+  wire [7:0]   uart_rx_data;
 
   // wire up the inputs and outputs
   assign rst = ~BTN_N;
@@ -51,15 +58,16 @@ module top
   assign P2_8 = arst;
   assign P2_9 = sclk;
   assign P2_10 = latch;
-  assign P1B1 = red;
-  assign P1B2 = blue;
-  assign P1B3 = aclk;
-  assign P1B4 = blank;
-  assign P1B7 = green;
-  assign P1B8 = arst;
-  assign P1B9 = sclk;
-  assign P1B10 = latch;
-    
+  assign P1A1  = uart_rx_dv;
+  assign P1A2  = uart_rx_data[1];
+  assign P1A3  = uart_rx_data[2];
+  assign P1A4  = uart_rx_data[3];
+  assign P1A7  = uart_rx_data[4];
+  assign P1A8  = uart_rx_data[5];
+  assign P1A9  = uart_rx_data[6];
+  assign P1A10 = uart_rx_data[7];
+  assign uart_data = P1B1;
+
   // clock divider
   always @(posedge CLK) begin
     begin
@@ -93,6 +101,7 @@ module top
   // instantiate the component
   led_panel_single top(.clk(clk_dut),
                        .reset(rst_delayed),
+                       .uart_data(uart_data),
                        .red_out(red),
                        .blue_out(blue),
                        .aclk_out(aclk),
@@ -100,7 +109,9 @@ module top
                        .green_out(green),
                        .arst_out(arst),
                        .sclk_out(sclk),
-                       .latch_out(latch)
-                       );              
+                       .latch_out(latch),
+                       .uart_rx_data_out(uart_rx_data),
+                       .uart_rx_dv_out(uart_rx_dv)
+                       );
 
 endmodule
