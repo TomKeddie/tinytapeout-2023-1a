@@ -28,7 +28,8 @@ module led_panel_single (
                          output       arst_out,
                          output       sclk_out,
                          output       latch_out,
-                         output [7:0] uart_rx_data_out
+                         output [7:0] uart_rx_data_out,
+                         output       uart_rx_dv_out
                          );
 
   // column
@@ -286,4 +287,5 @@ module led_panel_single (
   assign sclk_out = sclk;
   assign latch_out = ~latch;
   assign uart_rx_data_out = uart_rx_data;
+  assign uart_rx_dv_out = uart_rx_dv;
 endmodule

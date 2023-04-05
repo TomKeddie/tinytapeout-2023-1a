@@ -19,7 +19,7 @@ module top
    output P1A8,
    output P1A9,
    output P1A10,
-   output P1B1,
+   input  P1B1,
    output P1B2,
    output P1B3,
    output P1B4,
@@ -58,7 +58,7 @@ module top
   assign P2_8 = arst;
   assign P2_9 = sclk;
   assign P2_10 = latch;
-  assign P1A1  = uart_rx_data[0];
+  assign P1A1  = uart_rx_dv;
   assign P1A2  = uart_rx_data[1];
   assign P1A3  = uart_rx_data[2];
   assign P1A4  = uart_rx_data[3];
@@ -66,6 +66,7 @@ module top
   assign P1A8  = uart_rx_data[5];
   assign P1A9  = uart_rx_data[6];
   assign P1A10 = uart_rx_data[7];
+  assign uart_data = P1B1;
 
   // clock divider
   always @(posedge CLK) begin
@@ -109,7 +110,8 @@ module top
                        .arst_out(arst),
                        .sclk_out(sclk),
                        .latch_out(latch),
-                       .uart_rx_data_out(uart_rx_data)
+                       .uart_rx_data_out(uart_rx_data),
+                       .uart_rx_dv_out(uart_rx_dv)
                        );
 
 endmodule

@@ -9,7 +9,7 @@
 // Set Parameter CLKS_PER_BIT as follows:
 // CLKS_PER_BIT = (Frequency of i_Clock)/(Frequency of UART)
 // Example: 10 MHz Clock, 115200 baud UART
-// (10000000)/(115200) = 87
+// (12000)/(1200) = 10
   
 module uart_rx 
   (
@@ -25,7 +25,7 @@ module uart_rx
   parameter s_RX_STOP_BIT  = 3'b011;
   parameter s_CLEANUP      = 3'b100;
 
-  parameter CLKS_PER_BIT = 20;
+  parameter CLKS_PER_BIT = 10;
    
   reg           r_Rx_Data_R = 1'b1;
   reg           r_Rx_Data   = 1'b1;
