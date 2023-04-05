@@ -73,14 +73,14 @@ module led_panel_single (
     end else begin
       case(state)
         DATA1: begin
-          if (col_cnt[5] != 1'b1) begin
-            // clock rise
-            sclk <= 1'b1;
-          end
+          // clock rise
+          sclk <= 1'b1;
         end
         DATA2: begin
-          // clock fall
-          sclk    <= 1'b0;
+          if (col_cnt[5] != 1'b1) begin
+            // clock fall
+            sclk    <= 1'b0;
+          end
         end
       endcase
     end
