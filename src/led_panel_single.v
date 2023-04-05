@@ -17,57 +17,76 @@
 // BA=11 | 31 30 29 28 27 26 25 24 15 14 13 12 11 10 09 08
 
 module led_panel_single (
-                         input  clk,
-                         input  reset,
-                         input  uart_data,
-                         output red_out,
-                         output blue_out,
-                         output aclk_out,
-                         output blank_out,
-                         output green_out,
-                         output arst_out,
-                         output sclk_out,
-                         output latch_out,
+                         input        clk,
+                         input        reset,
+                         input        uart_data,
+                         output       red_out,
+                         output       blue_out,
+                         output       aclk_out,
+                         output       blank_out,
+                         output       green_out,
+                         output       arst_out,
+                         output       sclk_out,
+                         output       latch_out,
                          output [7:0] uart_rx_data_out
                          );
 
   // column
-  reg                                sclk;
-  reg                                blank;
-  reg                                latch;
-  reg                                red;
-  reg                                green;
-  reg                                blue;
-  reg [5:0]                          col_cnt;
+  reg                                 sclk;
+  reg                                 blank;
+  reg                                 latch;
+  reg                                 red;
+  reg                                 green;
+  reg                                 blue;
+  reg [5:0]                           col_cnt;
 
   // row
-  reg                                aclk;
-  reg                                arst;
-  reg [1:0]                          row_cnt;
+  reg                                 aclk;
+  reg                                 arst;
+  reg [1:0]                           row_cnt;
 
-  reg [3:0]                          state;
-  localparam       FIRSTCOL = 4'b0000;
-  localparam       CLOCK1 =   4'b0001;
-  localparam       CLOCK2 =   4'b0010;
-  localparam       LATCH =    4'b0011;
-  localparam       UNBLANK =  4'b0100;
-  localparam       PAUSE =    4'b0101;
-  localparam       NEXTROW =  4'b0110;
-  localparam       DATA1   =  4'b0111;
-  localparam       DATA2   =  4'b1000;
+  reg [2:0]                           state;
+  localparam       FIRSTCOL = 3'b000;
+  localparam       DATA1 =    3'b001;
+  localparam       DATA2 =    3'b010;
+  localparam       LATCH =    3'b011;
+  localparam       UNBLANK =  3'b100;
+  localparam       PAUSE =    3'b101;
+  localparam       NEXTROW =  3'b110;
 
   localparam       CLKS_PER_BIT = 20;
 
-  reg [7:0] frame_buffer [15:0];
-  wire [3:0] frame_column;
-  wire [3:0] frame_row;
+  reg [7:0]                           frame_buffer [15:0];
+  wire [3:0]                          frame_column;
+  wire [3:0]                          frame_row;
 
-  reg [2:0] rgb;
+  reg [2:0]                           rgb;
 
-  wire       uart_rx_dv;
-  wire [7:0] uart_rx_data;
+  wire                                uart_rx_dv;
+  wire [7:0]                          uart_rx_data;
 
-  // Columns
+
+  // Clock
+  always @(negedge clk) begin
+    if (reset == 1'b1) begin
+      sclk                 <= 1'b1;
+    end else begin
+      case(state)
+        DATA1: begin
+          if (col_cnt[5] != 1'b1) begin
+            // clock rise
+            sclk <= 1'b1;
+          end
+        end
+        DATA2: begin
+          // clock fall
+          sclk    <= 1'b0;
+        end
+      endcase
+    end
+  end
+
+  // Data
   always @(posedge clk) begin
     if (reset == 1'b1) begin
       state                <= FIRSTCOL;
@@ -76,7 +95,6 @@ module led_panel_single (
       blue                 <= 1'b0;
       blank                <= 1'b1;
       latch                <= 1'b1;
-      sclk                 <= 1'b1;
       col_cnt              <= 6'b000000;
       row_cnt              <= 2'b00;
       arst                 <= 1'b1;
@@ -145,7 +163,11 @@ module led_panel_single (
           col_cnt <= 6'b011111;
         end
         DATA1: begin
-          state   <= CLOCK1;
+          if (col_cnt[5] == 1'b1) begin
+            state <= LATCH;
+          end else begin
+            state <= DATA2;
+          end
           // default to black
           red   <= 1'b0;
           green <= 1'b0;
@@ -177,17 +199,9 @@ module led_panel_single (
             blue  <= 1'b0;
           end
         end
-        CLOCK1: begin
-          if (col_cnt[5] == 1'b1) begin
-            state <= LATCH;
-          end else begin
-            state <= DATA2;
-            // clock fall
-            sclk <= 1'b0;
-          end
-        end
         DATA2: begin
-          state <= CLOCK2;
+          state <= DATA1;
+          col_cnt <= col_cnt - 1;
           // default to black
           red   <= 1'b0;
           green <= 1'b0;
@@ -218,12 +232,6 @@ module led_panel_single (
               blue  <= rgb[0];
             end
           end
-        end
-        CLOCK2: begin
-          state   <= DATA1;
-          col_cnt <= col_cnt - 1;
-          // clock rise
-          sclk    <= 1'b1;
         end
         LATCH: begin
           state             <= UNBLANK;
