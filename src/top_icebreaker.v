@@ -1,5 +1,5 @@
 module top
-  #(parameter DIVIDER=500, DELAY_BIT=15)
+  #(parameter DIVIDER=1000, DELAY_BIT=15)
   (
    input  CLK,
    input  BTN_N,

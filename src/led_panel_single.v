@@ -286,12 +286,43 @@ module led_panel_single (
         case(uart_data_state)
           UDS_CTRL: begin
             if (uart_rx_dv == 1'b1) begin
-              if (uart_rx_data == 8'hf5) begin
-                // reset
-                uart_data_state <= UDS_CTRL;
-              end else if (uart_rx_data[7:4] == 1'h0) begin
-                rgb <= uart_rx_data[2:0];
-              end
+              case(uart_rx_data[7:4])
+                4'hf: begin
+                  // reset
+                  uart_data_state                  <= UDS_CTRL;
+                end
+                4'h0: begin
+                  // 0x set rgb colour
+                  rgb                          <= uart_rx_data[2:0];
+                end
+                4'h1: begin
+                  // 1x set pixel
+                  uart_data_state <= UDS_DATA1;
+                end
+                4'h2: begin
+                  // 2x clear pixel
+                  uart_data_state <= UDS_DATA1;
+                end
+                4'h3: begin
+                  // 3x clear screen
+                  frame_buffer[0]     <= 3'b0;
+                  frame_buffer[1]     <= 3'b0;
+                  frame_buffer[2]     <= 3'b0;
+                  frame_buffer[3]     <= 3'b0;
+                  frame_buffer[4]     <= 3'b0;
+                  frame_buffer[5]     <= 3'b0;
+                  frame_buffer[6]     <= 3'b0;
+                  frame_buffer[7]     <= 3'b0;
+                  frame_buffer[8]     <= 3'b0;
+                  frame_buffer[9]     <= 3'b0;
+                  frame_buffer[10]    <= 3'b0;
+                  frame_buffer[11]    <= 3'b0;
+                  frame_buffer[12]    <= 3'b0;
+                  frame_buffer[13]    <= 3'b0;
+                  frame_buffer[14]    <= 3'b0;
+                  frame_buffer[15]    <= 3'b0;
+                end
+              endcase
             end
           end
           UDS_DATA1:  begin
