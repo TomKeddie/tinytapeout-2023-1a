@@ -91,15 +91,16 @@ module led_panel_single (
           led_data_state <= LDS_DATA;
           // blank still on, other off
           latch          <= 1'b1;
-          col_cnt        <= 6'b011111;
           sclk_en        <= 1'b1;
+          col_cnt        <= col_cnt - 1;
         end
         LDS_DATA: begin
-          if (col_cnt == 5'b00000) begin
+          if (col_cnt == 6'b111111) begin
             led_data_state <= LDS_LATCH;
             sclk_en        <= 1'b0;
+          end else begin
+            col_cnt <= col_cnt - 1;
           end
-          col_cnt <= col_cnt - 1;
           // default to black
           red   <= 1'b0;
           green <= 1'b0;
@@ -161,6 +162,7 @@ module led_panel_single (
           // blank on
           blank   <= 1'b1;
           led_data_state <= LDS_FIRSTCOL;
+          col_cnt        <= 6'b011111;
           if (row_cnt == 2'b11) begin
             row_cnt <= 2'b00;
           end else begin
@@ -195,7 +197,10 @@ module led_panel_single (
       frame_buffer[14]    <= 3'b0;
       frame_buffer[15]    <= 3'b0;
 
-      frame_buffer[1][0] <= 1'b1;
+      frame_buffer[0][0] <= 1'b1;
+      frame_buffer[15][0] <= 1'b1;
+      frame_buffer[0][7] <= 1'b1;
+      frame_buffer[15][6] <= 1'b1;
       //       // T
       //       frame_buffer[15][1] <= 1'b1;
       //       frame_buffer[14][1] <= 1'b1;
