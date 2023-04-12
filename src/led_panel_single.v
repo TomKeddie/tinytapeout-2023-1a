@@ -34,6 +34,7 @@ module led_panel_single (
 
   // column
   reg                                 sclk;
+  reg                                 sclk_en;
   reg                                 blank;
   reg                                 latch;
   reg                                 red;
@@ -48,8 +49,7 @@ module led_panel_single (
 
   reg [2:0]                           led_data_state;
   localparam       LDS_FIRSTCOL = 3'b000;
-  localparam       LDS_DATA1 =    3'b001;
-  localparam       LDS_DATA2 =    3'b010;
+  localparam       LDS_DATA =    3'b001;
   localparam       LDS_LATCH =    3'b011;
   localparam       LDS_UNBLANK =  3'b100;
   localparam       LDS_PAUSE =    3'b101;
@@ -73,61 +73,38 @@ module led_panel_single (
 
 
   // Clock
-  always @(negedge clk) begin
-    if (reset == 1'b1) begin
-      sclk                 <= 1'b1;
-    end else begin
-      case(led_data_state)
-        LDS_DATA1: begin
-          // clock rise
-          sclk <= 1'b1;
-        end
-        LDS_DATA2: begin
-          if (col_cnt[5] != 1'b1) begin
-            // clock fall
-            sclk    <= 1'b0;
-          end
-        end
-      endcase
-    end
-  end
-
+  assign sclk = sclk_en ? !clk : 1'b1;
+  
   // Data
   always @(posedge clk) begin
     if (reset == 1'b1) begin
-      led_data_state                <= LDS_FIRSTCOL;
-      red                  <= 1'b0;
-      green                <= 1'b0;
-      blue                 <= 1'b0;
-      blank                <= 1'b1;
-      latch                <= 1'b1;
-      col_cnt              <= 6'b000000;
-      row_cnt              <= 2'b00;
-      arst                 <= 1'b1;
-      aclk                 <= 1'b0;
+      led_data_state <= LDS_FIRSTCOL;
+      red            <= 1'b0;
+      green          <= 1'b0;
+      blue           <= 1'b0;
+      blank          <= 1'b1;
+      latch          <= 1'b1;
+      col_cnt        <= 6'b000000;
+      row_cnt        <= 2'b00;
+      arst           <= 1'b1;
+      aclk           <= 1'b0;
+      sclk_en        <= 1'b0;
     end else begin
       case(led_data_state)
         LDS_FIRSTCOL: begin
-          led_data_state   <= LDS_DATA1;
+          led_data_state <= LDS_DATA;
           // blank still on, other off
-          latch   <= 1'b1;
-          arst    <= 1'b0;
-          aclk    <= 1'b0;
-          col_cnt <= 6'b011111;
+          latch          <= 1'b1;
+          arst           <= 1'b0;
+          aclk           <= 1'b0;
+          col_cnt        <= 6'b011111;
+          sclk_en        <= 1'b1;
         end
-        LDS_DATA1: begin
+        LDS_DATA: begin
           if (col_cnt[5] == 1'b1) begin
             led_data_state <= LDS_LATCH;
-          end else begin
-            led_data_state <= LDS_DATA2;
+            sclk_en        <= 1'b0;
           end
-          // black
-          red   <= 1'b0;
-          green <= 1'b0;
-          blue  <= 1'b0;
-        end
-        LDS_DATA2: begin
-          led_data_state <= LDS_DATA1;
           col_cnt <= col_cnt - 1;
           // default to black
           red   <= 1'b0;
