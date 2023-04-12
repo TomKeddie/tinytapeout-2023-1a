@@ -121,36 +121,10 @@ module led_panel_single (
           end else begin
             led_data_state <= LDS_DATA2;
           end
-          // default to black
+          // black
           red   <= 1'b0;
           green <= 1'b0;
           blue  <= 1'b0;
-          // lower half data on falling edge
-          if (col_cnt < 8) begin
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
-              // lower half: upper right quadrant
-              red   <= rgb[2];
-              green <= rgb[1];
-              blue  <= rgb[0];
-            end
-          end else if (col_cnt < 16) begin
-            // lower half: lower right quadrant BLACK
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
-          end else if (col_cnt < 24) begin
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
-              // lower half: upper left quadrant
-              red   <= rgb[2];
-              green <= rgb[1];
-              blue  <= rgb[0];
-            end
-          end else begin
-            // lower half: lower left quadrant BLACK
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
-          end
         end
         LDS_DATA2: begin
           led_data_state <= LDS_DATA1;
@@ -162,24 +136,28 @@ module led_panel_single (
           // upper half data on rising edge
           if (col_cnt < 8) begin
             // upper half: upper right quadrant BLACK
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
-          end else if (col_cnt < 16) begin
             if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
-              // upper half: lower right quadrant
+              red   <= rgb[2];
+              green <= rgb[1];
+              blue  <= rgb[0];
+            end
+          end else if (col_cnt < 16) begin
+            // upper half: lower right quadrant
+            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
               red   <= rgb[2];
               green <= rgb[1];
               blue  <= rgb[0];
             end
           end else if (col_cnt < 24) begin
             // upper half: upper left quadrant BLACK
-            red   <= 1'b0;
-            green <= 1'b0;
-            blue  <= 1'b0;
-          end else begin
             if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
-              // upper half: lower left quadrant
+              red   <= rgb[2];
+              green <= rgb[1];
+              blue  <= rgb[0];
+            end
+          end else begin
+            // upper half: lower left quadrant
+            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
               red   <= rgb[2];
               green <= rgb[1];
               blue  <= rgb[0];
@@ -249,39 +227,39 @@ module led_panel_single (
       frame_buffer[15]    <= 3'b0;
 
       // T
-      frame_buffer[15][2] <= 1'b1;
+      frame_buffer[15][1] <= 1'b1;
+      frame_buffer[14][1] <= 1'b1;
+      frame_buffer[13][1] <= 1'b1;
       frame_buffer[14][2] <= 1'b1;
-      frame_buffer[13][2] <= 1'b1;
       frame_buffer[14][3] <= 1'b1;
       frame_buffer[14][4] <= 1'b1;
       frame_buffer[14][5] <= 1'b1;
-      frame_buffer[14][6] <= 1'b1;
       // T
-      frame_buffer[11][2] <= 1'b1;
+      frame_buffer[11][1] <= 1'b1;
+      frame_buffer[10][1] <= 1'b1;
+      frame_buffer[09][1] <= 1'b1;
       frame_buffer[10][2] <= 1'b1;
-      frame_buffer[09][2] <= 1'b1;
       frame_buffer[10][3] <= 1'b1;
       frame_buffer[10][4] <= 1'b1;
       frame_buffer[10][5] <= 1'b1;
-      frame_buffer[10][6] <= 1'b1;
       // 0
-      frame_buffer[6][2]  <= 1'b1;
+      frame_buffer[6][1]  <= 1'b1;
+      frame_buffer[5][2]  <= 1'b1;
+      frame_buffer[7][2]  <= 1'b1;
       frame_buffer[5][3]  <= 1'b1;
       frame_buffer[7][3]  <= 1'b1;
       frame_buffer[5][4]  <= 1'b1;
       frame_buffer[7][4]  <= 1'b1;
-      frame_buffer[5][5]  <= 1'b1;
-      frame_buffer[7][5]  <= 1'b1;
-      frame_buffer[6][6]  <= 1'b1;
+      frame_buffer[6][5]  <= 1'b1;
       // 3
-      frame_buffer[3][2]  <= 1'b1;
-      frame_buffer[2][2]  <= 1'b1;
-      frame_buffer[1][3]  <= 1'b1;
-      frame_buffer[3][4]  <= 1'b1;
-      frame_buffer[2][4]  <= 1'b1;
-      frame_buffer[1][5]  <= 1'b1;
-      frame_buffer[3][6]  <= 1'b1;
-      frame_buffer[2][6]  <= 1'b1;
+      frame_buffer[3][1]  <= 1'b1;
+      frame_buffer[2][1]  <= 1'b1;
+      frame_buffer[1][2]  <= 1'b1;
+      frame_buffer[3][3]  <= 1'b1;
+      frame_buffer[2][3]  <= 1'b1;
+      frame_buffer[1][4]  <= 1'b1;
+      frame_buffer[3][5]  <= 1'b1;
+      frame_buffer[2][5]  <= 1'b1;
       end else begin // if (reset == 1'b1)
         case(uart_data_state)
           UDS_CTRL: begin
