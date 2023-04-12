@@ -22,12 +22,12 @@ module led_panel_single (
                          input        uart_data,
                          output       red_out,
                          output       blue_out,
-                         output       aclk_out,
                          output       blank_out,
                          output       green_out,
-                         output       arst_out,
                          output       sclk_out,
                          output       latch_out,
+                         output       a_out,
+                         output       b_out,
                          output [7:0] uart_rx_data_out,
                          output       uart_rx_dv_out
                          );
@@ -43,8 +43,6 @@ module led_panel_single (
   reg [5:0]                           col_cnt;
 
   // row
-  reg                                 aclk;
-  reg                                 arst;
   reg [1:0]                           row_cnt;
 
   reg [2:0]                           led_data_state;
@@ -86,8 +84,6 @@ module led_panel_single (
       latch          <= 1'b1;
       col_cnt        <= 6'b000000;
       row_cnt        <= 2'b00;
-      arst           <= 1'b1;
-      aclk           <= 1'b0;
       sclk_en        <= 1'b0;
     end else begin
       case(led_data_state)
@@ -95,13 +91,11 @@ module led_panel_single (
           led_data_state <= LDS_DATA;
           // blank still on, other off
           latch          <= 1'b1;
-          arst           <= 1'b0;
-          aclk           <= 1'b0;
           col_cnt        <= 6'b011111;
           sclk_en        <= 1'b1;
         end
         LDS_DATA: begin
-          if (col_cnt[5] == 1'b1) begin
+          if (col_cnt == 5'b00000) begin
             led_data_state <= LDS_LATCH;
             sclk_en        <= 1'b0;
           end
@@ -155,7 +149,7 @@ module led_panel_single (
           latch     <= 1'b1;
           col_cnt <= 6'b00000;
         end
-       LDS_PAUSE: begin
+        LDS_PAUSE: begin
           // reuse col_cnt counter for delay
           if (col_cnt == 6'b000010) begin
             led_data_state <= LDS_NEXTROW;
@@ -163,16 +157,14 @@ module led_panel_single (
             col_cnt <= col_cnt + 1;
           end
         end
-       LDS_NEXTROW: begin
+        LDS_NEXTROW: begin
           // blank on
           blank   <= 1'b1;
           led_data_state <= LDS_FIRSTCOL;
           if (row_cnt == 2'b11) begin
             row_cnt <= 2'b00;
-            arst    <= 1'b1;
           end else begin
             row_cnt <= row_cnt + 1;
-            aclk <= 1'b1;
           end
         end
       endcase
@@ -184,7 +176,7 @@ module led_panel_single (
     if (reset == 1'b1) begin
       uart_data_state <= UDS_CTRL;
 
-      rgb                  <= 3'b101;
+      rgb                  <= 3'b111;
 
       frame_buffer[0]     <= 3'b0;
       frame_buffer[1]     <= 3'b0;
@@ -203,100 +195,101 @@ module led_panel_single (
       frame_buffer[14]    <= 3'b0;
       frame_buffer[15]    <= 3'b0;
 
-      // T
-      frame_buffer[15][1] <= 1'b1;
-      frame_buffer[14][1] <= 1'b1;
-      frame_buffer[13][1] <= 1'b1;
-      frame_buffer[14][2] <= 1'b1;
-      frame_buffer[14][3] <= 1'b1;
-      frame_buffer[14][4] <= 1'b1;
-      frame_buffer[14][5] <= 1'b1;
-      // T
-      frame_buffer[11][1] <= 1'b1;
-      frame_buffer[10][1] <= 1'b1;
-      frame_buffer[09][1] <= 1'b1;
-      frame_buffer[10][2] <= 1'b1;
-      frame_buffer[10][3] <= 1'b1;
-      frame_buffer[10][4] <= 1'b1;
-      frame_buffer[10][5] <= 1'b1;
-      // 0
-      frame_buffer[6][1]  <= 1'b1;
-      frame_buffer[5][2]  <= 1'b1;
-      frame_buffer[7][2]  <= 1'b1;
-      frame_buffer[5][3]  <= 1'b1;
-      frame_buffer[7][3]  <= 1'b1;
-      frame_buffer[5][4]  <= 1'b1;
-      frame_buffer[7][4]  <= 1'b1;
-      frame_buffer[6][5]  <= 1'b1;
-      // 3
-      frame_buffer[3][1]  <= 1'b1;
-      frame_buffer[2][1]  <= 1'b1;
-      frame_buffer[1][2]  <= 1'b1;
-      frame_buffer[3][3]  <= 1'b1;
-      frame_buffer[2][3]  <= 1'b1;
-      frame_buffer[1][4]  <= 1'b1;
-      frame_buffer[3][5]  <= 1'b1;
-      frame_buffer[2][5]  <= 1'b1;
-      end else begin // if (reset == 1'b1)
-        case(uart_data_state)
-          UDS_CTRL: begin
-            if (uart_rx_dv == 1'b1) begin
-              case(uart_rx_data[7:4])
-                4'hf: begin
-                  // reset
-                  uart_data_state                  <= UDS_CTRL;
-                end
-                4'h0: begin
-                  // 0x set rgb colour
-                  rgb                          <= uart_rx_data[2:0];
-                end
-                4'h1: begin
-                  // 1x set pixel
-                  uart_data_state <= UDS_DATA1;
-                end
-                4'h2: begin
-                  // 2x clear pixel
-                  uart_data_state <= UDS_DATA1;
-                end
-                4'h3: begin
-                  // 3x clear screen
-                  frame_buffer[0]     <= 3'b0;
-                  frame_buffer[1]     <= 3'b0;
-                  frame_buffer[2]     <= 3'b0;
-                  frame_buffer[3]     <= 3'b0;
-                  frame_buffer[4]     <= 3'b0;
-                  frame_buffer[5]     <= 3'b0;
-                  frame_buffer[6]     <= 3'b0;
-                  frame_buffer[7]     <= 3'b0;
-                  frame_buffer[8]     <= 3'b0;
-                  frame_buffer[9]     <= 3'b0;
-                  frame_buffer[10]    <= 3'b0;
-                  frame_buffer[11]    <= 3'b0;
-                  frame_buffer[12]    <= 3'b0;
-                  frame_buffer[13]    <= 3'b0;
-                  frame_buffer[14]    <= 3'b0;
-                  frame_buffer[15]    <= 3'b0;
-                end
-              endcase
-            end
-          end
-          UDS_DATA1:  begin
-            if (uart_rx_dv == 1'b1) begin
-              if (uart_rx_data == 8'hf5) begin
+      frame_buffer[1][0] <= 1'b1;
+      //       // T
+      //       frame_buffer[15][1] <= 1'b1;
+      //       frame_buffer[14][1] <= 1'b1;
+      //       frame_buffer[13][1] <= 1'b1;
+      //       frame_buffer[14][2] <= 1'b1;
+      //       frame_buffer[14][3] <= 1'b1;
+      //       frame_buffer[14][4] <= 1'b1;
+      //       frame_buffer[14][5] <= 1'b1;
+      //       // T
+      //       frame_buffer[11][1] <= 1'b1;
+      //       frame_buffer[10][1] <= 1'b1;
+      //       frame_buffer[09][1] <= 1'b1;
+      //       frame_buffer[10][2] <= 1'b1;
+      //       frame_buffer[10][3] <= 1'b1;
+      //       frame_buffer[10][4] <= 1'b1;
+      //       frame_buffer[10][5] <= 1'b1;
+      //       // 0
+      //       frame_buffer[6][1]  <= 1'b1;
+      //       frame_buffer[5][2]  <= 1'b1;
+      //       frame_buffer[7][2]  <= 1'b1;
+      //       frame_buffer[5][3]  <= 1'b1;
+      //       frame_buffer[7][3]  <= 1'b1;
+      //       frame_buffer[5][4]  <= 1'b1;
+      //       frame_buffer[7][4]  <= 1'b1;
+      //       frame_buffer[6][5]  <= 1'b1;
+      //       // 3
+      //       frame_buffer[3][1]  <= 1'b1;
+      //       frame_buffer[2][1]  <= 1'b1;
+      //       frame_buffer[1][2]  <= 1'b1;
+      //       frame_buffer[3][3]  <= 1'b1;
+      //       frame_buffer[2][3]  <= 1'b1;
+      //       frame_buffer[1][4]  <= 1'b1;
+      //       frame_buffer[3][5]  <= 1'b1;
+      //       frame_buffer[2][5]  <= 1'b1;
+    end else begin // if (reset == 1'b1)
+      case(uart_data_state)
+        UDS_CTRL: begin
+          if (uart_rx_dv == 1'b1) begin
+            case(uart_rx_data[7:4])
+              4'hf: begin
                 // reset
-                uart_data_state <= UDS_CTRL;
+                uart_data_state                  <= UDS_CTRL;
               end
+              4'h0: begin
+                // 0x set rgb colour
+                rgb                          <= uart_rx_data[2:0];
+              end
+              4'h1: begin
+                // 1x set pixel
+                uart_data_state <= UDS_DATA1;
+              end
+              4'h2: begin
+                // 2x clear pixel
+                uart_data_state <= UDS_DATA1;
+              end
+              4'h3: begin
+                // 3x clear screen
+                frame_buffer[0]     <= 3'b0;
+                frame_buffer[1]     <= 3'b0;
+                frame_buffer[2]     <= 3'b0;
+                frame_buffer[3]     <= 3'b0;
+                frame_buffer[4]     <= 3'b0;
+                frame_buffer[5]     <= 3'b0;
+                frame_buffer[6]     <= 3'b0;
+                frame_buffer[7]     <= 3'b0;
+                frame_buffer[8]     <= 3'b0;
+                frame_buffer[9]     <= 3'b0;
+                frame_buffer[10]    <= 3'b0;
+                frame_buffer[11]    <= 3'b0;
+                frame_buffer[12]    <= 3'b0;
+                frame_buffer[13]    <= 3'b0;
+                frame_buffer[14]    <= 3'b0;
+                frame_buffer[15]    <= 3'b0;
+              end
+            endcase
+          end
+        end
+        UDS_DATA1:  begin
+          if (uart_rx_dv == 1'b1) begin
+            if (uart_rx_data == 8'hf5) begin
+              // reset
+              uart_data_state <= UDS_CTRL;
             end
           end
-          UDS_DATA2:  begin
-            if (uart_rx_dv == 1'b1) begin
-              if (uart_rx_data == 8'hf5) begin
-                // reset
-                uart_data_state <= UDS_CTRL;
-              end
+        end
+        UDS_DATA2:  begin
+          if (uart_rx_dv == 1'b1) begin
+            if (uart_rx_data == 8'hf5) begin
+              // reset
+              uart_data_state <= UDS_CTRL;
             end
           end
-        endcase
+        end
+      endcase
     end
   end
 
@@ -309,10 +302,11 @@ module led_panel_single (
   assign blue_out = blue;
   assign blank_out = blank;
   assign green_out = green;
-  assign arst_out = arst;
-  assign aclk_out = aclk;
   assign sclk_out = sclk;
   assign latch_out = ~latch;
   assign uart_rx_data_out = uart_rx_data;
   assign uart_rx_dv_out = uart_rx_dv;
+  assign a_out = row_cnt[0];
+  assign b_out = row_cnt[1];
+  
 endmodule

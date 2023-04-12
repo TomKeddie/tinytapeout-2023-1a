@@ -32,12 +32,12 @@ module top
   reg     clk_dut;
   wire    red;
   wire    blue;
-  wire    aclk;
   wire    blank;
   wire    green;
-  wire    arst;
   wire    sclk;
   wire    latch;
+  wire    a;
+  wire    b;
 
   reg [15:0] clk_divide_counter;
   reg [15:0]   rst_delay_counter;
@@ -47,15 +47,16 @@ module top
 
   wire         uart_data;
   wire [7:0]   uart_rx_data;
+  wire         uart_rx_dv;
 
   // wire up the inputs and outputs
   assign rst = ~BTN_N;
   assign P2_1 = red;
   assign P2_2 = blue;
-  assign P2_3 = aclk;
+  assign P2_3 = b;
   assign P2_4 = blank;
   assign P2_7 = green;
-  assign P2_8 = arst;
+  assign P2_8 = a;
   assign P2_9 = sclk;
   assign P2_10 = latch;
   assign P1A1  = uart_rx_dv;
@@ -104,12 +105,12 @@ module top
                        .uart_data(uart_data),
                        .red_out(red),
                        .blue_out(blue),
-                       .aclk_out(aclk),
                        .blank_out(blank),
                        .green_out(green),
-                       .arst_out(arst),
                        .sclk_out(sclk),
                        .latch_out(latch),
+                       .a_out(a),
+                       .b_out(b),
                        .uart_rx_data_out(uart_rx_data),
                        .uart_rx_dv_out(uart_rx_dv)
                        );

@@ -39,17 +39,17 @@ documentation:
     - none
     - none
     - none
-    - rowmax[0]
-    - rowmax[1]
-    - rowmax[2]
+    - none
+    - none
+    - none
 # A description of what the outputs do
   outputs:
     - red
     - blue
-    - aclk
+    - b
     - blank
     - green
-    - arst
+    - a
     - sclk
     - latch
 

@@ -14,12 +14,12 @@ module tb (
             input [7:0] uart_tx_data,
             output      red,
             output      blue,
-            output      aclk,
             output      blank,
             output      green,
-            output      arst,
             output      sclk,
             output      latch,
+            output      a,
+            output      b,
             output      uart_tx_done
            );
 
@@ -46,10 +46,10 @@ module tb (
                        .reset(reset), 
                        .red_out(red),     
                        .blue_out(blue),    
-                       .aclk_out(aclk),    
                        .blank_out(blank),   
                        .green_out(green),  
-                       .arst_out(arst),    
+                       .a_out(a),
+                       .b_out(b),
                        .sclk_out(sclk),    
                        .latch_out(latch),
                        .uart_data(uart_data)
