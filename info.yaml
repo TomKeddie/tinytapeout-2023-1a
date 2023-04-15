@@ -37,12 +37,14 @@ documentation:
           - single colour at once
           - no double buffer, updates may have artifacts
           - refresh rate is low, some flicker is observed (16*8=128 pixels at 6kHz is ~46Hz, plus overhead)
+        * Mode pin to allow for 2 different clocking patterns
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test:  |
         * Connect the display module as per the outputs
         * Connect the uart
         * Power on and see the TT03 text
+        * If the display is swapped by quadrant change the mode pin
         * Use the script(s) in the software directory to control the display
 
 # A description of what the inputs do
@@ -50,7 +52,7 @@ documentation:
     - clock
     - reset
     - uart
-    - none
+    - mode
     - none
     - none
     - none

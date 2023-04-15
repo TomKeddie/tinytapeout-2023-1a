@@ -20,6 +20,7 @@ module led_panel_single (
                          input        clk,
                          input        reset,
                          input        uart_data,
+                         input        mode,
                          output       red_out,
                          output       blue_out,
                          output       blank_out,
@@ -99,7 +100,7 @@ module led_panel_single (
           blue  <= 1'b0;
           // upper half data on rising edge
           if (col_cnt < 8) begin
-            // upper half: upper right quadrant BLACK
+            // upper half: upper right quadrant
             if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
               red   <= rgb[2];
               green <= rgb[1];
@@ -107,18 +108,34 @@ module led_panel_single (
             end
           end else if (col_cnt < 16) begin
             // upper half: lower right quadrant
-            if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
-              red   <= rgb[2];
-              green <= rgb[1];
-              blue  <= rgb[0];
+            if (mode) begin
+              if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
+                red   <= rgb[2];
+                green <= rgb[1];
+                blue  <= rgb[0];
+              end
+            end else begin
+              if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
+                red   <= rgb[2];
+                green <= rgb[1];
+                blue  <= rgb[0];
+              end
             end
           end else if (col_cnt < 24) begin
-            // upper half: upper left quadrant BLACK
-            if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
-              red   <= rgb[2];
-              green <= rgb[1];
-              blue  <= rgb[0];
-            end
+            // upper half: upper left quadrant
+            if (mode) begin
+              if (frame_buffer[{1'b0, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin
+                red   <= rgb[2];
+                green <= rgb[1];
+                blue  <= rgb[0];
+              end
+            end else begin
+              if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b0, row_cnt}] == 1'b1) begin
+                red   <= rgb[2];
+                green <= rgb[1];
+                blue  <= rgb[0];
+              end
+            end 
           end else begin
             // upper half: lower left quadrant
             if (frame_buffer[{1'b1, col_cnt[2:0]}][{1'b1, row_cnt}] == 1'b1) begin

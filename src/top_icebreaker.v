@@ -11,7 +11,7 @@ module top
    output P2_8,
    output P2_9,
    output P2_10,
-   output P1A1,
+   input P1A1,
    output P1A2,
    output P1A3,
    output P1A4,
@@ -49,6 +49,8 @@ module top
   wire [7:0]   uart_rx_data;
   wire         uart_rx_dv;
 
+  wire         mode;
+
   // wire up the inputs and outputs
   assign rst = ~BTN_N;
   assign P2_1 = red;
@@ -59,15 +61,8 @@ module top
   assign P2_8 = a;
   assign P2_9 = sclk;
   assign P2_10 = latch;
-  assign P1A1  = uart_rx_dv;
-  assign P1A2  = uart_rx_data[1];
-  assign P1A3  = uart_rx_data[2];
-  assign P1A4  = uart_rx_data[3];
-  assign P1A7  = uart_rx_data[4];
-  assign P1A8  = uart_rx_data[5];
-  assign P1A9  = uart_rx_data[6];
-  assign P1A10 = uart_rx_data[7];
   assign uart_data = P1B1;
+  assign mode = P1A1;
 
   // clock divider
   always @(posedge CLK) begin
@@ -103,6 +98,7 @@ module top
   led_panel_single top(.clk(clk_dut),
                        .reset(rst_delayed),
                        .uart_data(uart_data),
+                       .mode(mode),
                        .red_out(red),
                        .blue_out(blue),
                        .blank_out(blank),

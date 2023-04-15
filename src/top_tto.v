@@ -19,6 +19,7 @@ module tomkeddie_top_tto_a
   wire          a;
   wire          b;
   wire          uart_data;
+  wire          mode;
 
   assign io_out[0] = red;
   assign io_out[1] = blue;
@@ -32,11 +33,13 @@ module tomkeddie_top_tto_a
   assign clk       = io_in[0];
   assign rst       = io_in[1];
   assign uart_data = io_in[2];
+  assign mode      = io_in[3];
 
   // instantiate the component
   led_panel_single top(.clk(clk),
                        .reset(rst),
                        .uart_data(uart_data),
+                       .mode(mode),
                        .red_out(red),     
                        .blue_out(blue),    
                        .blank_out(blank),   

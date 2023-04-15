@@ -43,7 +43,7 @@ module tb (
 
   // instantiate the DUT
   led_panel_single top(.clk(clk),
-                       .reset(reset), 
+                       .reset(reset),
                        .red_out(red),     
                        .blue_out(blue),    
                        .blank_out(blank),   
@@ -52,7 +52,8 @@ module tb (
                        .b_out(b),
                        .sclk_out(sclk),    
                        .latch_out(latch),
-                       .uart_data(uart_data)
+                       .uart_data(uart_data),
+                       .mode(1'b0)
                        );
 
   // 6000/300 = 20
