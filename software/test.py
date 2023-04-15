@@ -36,30 +36,34 @@ ser.write(b"\x03")
 # across the top
 iy=0
 for ix in range(16):
-    print("ix={0},iy={1}".format(ix, iy))
     pixel_set(ser, ix, iy)
     time.sleep(0.25)
     pixel_clr(ser, ix, iy)
 
 # down the left side
 for iy in range(1, 8, 1):
-    print("ix={0},iy={1}".format(ix, iy))
     pixel_set(ser, ix, iy)
     time.sleep(0.25)
     pixel_clr(ser, ix, iy)
     
 # across the bottom
 for ix in range(14, -1, -1):
-    print("ix={0},iy={1}".format(ix, iy))
     pixel_set(ser, ix, iy)
     time.sleep(0.25)
     pixel_clr(ser, ix, iy)
 
 # up the right side
 for iy in range(6, 0, -1):
-    print("ix={0},iy={1}".format(ix, iy))
     pixel_set(ser, ix, iy)
     time.sleep(0.25)
     pixel_clr(ser, ix, iy)
 
+# all pixels
+for iy in range(8):
+    for ix in range(16):
+        pixel_set(ser, ix, iy)
+        time.sleep(0.25)
+        pixel_clr(ser, ix, iy)
+
+    
 ser.close()

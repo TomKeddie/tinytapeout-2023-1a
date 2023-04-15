@@ -76,30 +76,24 @@ module led_panel_single (
   // Data
   always @(posedge clk) begin
     if (reset == 1'b1) begin
-      led_data_state <= LDS_FIRSTCOL;
+      led_data_state <= LDS_NEXTROW;
       red            <= 1'b0;
       green          <= 1'b0;
       blue           <= 1'b0;
       blank          <= 1'b1;
       latch          <= 1'b1;
       col_cnt        <= 6'b011111;
-      row_cnt        <= 2'b00;
+      row_cnt        <= 2'b11;
       sclk_en        <= 1'b0;
     end else begin
       case(led_data_state)
-        LDS_FIRSTCOL: begin
-          led_data_state <= LDS_DATA;
-          // blank still on, other off
-          latch          <= 1'b1;
-          sclk_en        <= 1'b1;
-          col_cnt        <= col_cnt - 1;
-        end
         LDS_DATA: begin
           if (col_cnt == 6'b111111) begin
             led_data_state <= LDS_LATCH;
             sclk_en        <= 1'b0;
           end else begin
             col_cnt <= col_cnt - 1;
+            sclk_en        <= 1'b1;
           end
           // default to black
           red   <= 1'b0;
@@ -144,25 +138,18 @@ module led_panel_single (
           // blank     <= 1'b1;
         end
         LDS_UNBLANK: begin
-          led_data_state <= LDS_PAUSE;
+          led_data_state <= LDS_NEXTROW;
           // blank off, latch off
           blank     <= 1'b0;
           latch     <= 1'b1;
           col_cnt <= 6'b00000;
         end
-        LDS_PAUSE: begin
-          // reuse col_cnt counter for delay
-          if (col_cnt == 6'b000010) begin
-            led_data_state <= LDS_NEXTROW;
-          end else begin
-            col_cnt <= col_cnt + 1;
-          end
-        end
         LDS_NEXTROW: begin
           // blank on
-          blank   <= 1'b1;
-          led_data_state <= LDS_FIRSTCOL;
+          blank          <= 1'b1;
+          led_data_state <= LDS_DATA;
           col_cnt        <= 6'b011111;
+          
           if (row_cnt == 2'b11) begin
             row_cnt <= 2'b00;
           end else begin
@@ -178,7 +165,7 @@ module led_panel_single (
     if (reset == 1'b1) begin
       uart_data_state <= UDS_CTRL;
 
-      rgb                  <= 3'b111;
+      rgb                  <= 3'b011;
 
       frame_buffer[0]     <= 3'b0;
       frame_buffer[1]     <= 3'b0;

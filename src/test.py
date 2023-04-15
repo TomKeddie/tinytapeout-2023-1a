@@ -14,7 +14,7 @@ async def top(dut):
     await ClockCycles(dut.clk, 10)
     dut.reset.value = 0
 
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 500)
 
     # reset
     dut.uart_tx_data.value = 0xFF
