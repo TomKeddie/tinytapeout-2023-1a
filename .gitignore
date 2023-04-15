@@ -7,5 +7,9 @@ src/sim_build
 src/__pycache__/
 src/results.xml
 src/user_config.tcl
+src/top_icebreaker.asc
+src/top_icebreaker.bin
+src/top_icebreaker.json
+src/top_icebreaker.log
 *~
 software/venv/

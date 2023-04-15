@@ -45,13 +45,11 @@ module led_panel_single (
   // row
   reg [1:0]                           row_cnt;
 
-  reg [2:0]                           led_data_state;
-  localparam       LDS_FIRSTCOL = 3'b000;
-  localparam       LDS_DATA =    3'b001;
-  localparam       LDS_LATCH =    3'b011;
-  localparam       LDS_UNBLANK =  3'b100;
-  localparam       LDS_PAUSE =    3'b101;
-  localparam       LDS_NEXTROW =  3'b110;
+  reg [1:0]                           led_data_state;
+  localparam       LDS_DATA =     2'b00;
+  localparam       LDS_LATCH =    2'b01;
+  localparam       LDS_UNBLANK =  2'b10;
+  localparam       LDS_NEXTROW =  2'b11;
 
   localparam       CLKS_PER_BIT = 20;
 
@@ -64,10 +62,10 @@ module led_panel_single (
   wire                                uart_rx_dv;
   wire [7:0]                          uart_rx_data;
 
-  reg [2:0]                           uart_data_state;
-  localparam      UDS_CTRL   = 3'b000;
-  localparam      UDS_SET    = 3'b001;
-  localparam      UDS_CLR    = 3'b010;
+  reg [1:0]                           uart_data_state;
+  localparam      UDS_CTRL   = 2'b00;
+  localparam      UDS_SET    = 2'b01;
+  localparam      UDS_CLR    = 2'b10;
 
 
   // Clock
@@ -142,7 +140,7 @@ module led_panel_single (
           // blank off, latch off
           blank     <= 1'b0;
           latch     <= 1'b1;
-          col_cnt <= 6'b00000;
+          col_cnt <= 6'b000000;
         end
         LDS_NEXTROW: begin
           // blank on
