@@ -26,17 +26,17 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
-        The circuit updates half of a P10 16x16 LED display module.
-        It initially displays the string TT03.
-        It provides a 600baud uart input to paint pixels, clear the display and chnage the displayed colour.
-        Functionality is limited by resource availability and clock rate
+        * The circuit updates half of a P10 16x16 LED display module
+        * It initially displays the string TT03
+        * It provides a 600baud uart input to paint pixels, clear the display and change the displayed colour
+        * Functionality is limited by resource availability and clock rate
 
 # Instructions on how someone could test your project, include things like what buttons do what and how to set the clock if needed
   how_to_test:  |
-      Connect the display module as per the outputs
-      Connect the uart
-      Power on and see the TT03 text
-      Use the script(s) in the software directory to control the display
+        * Connect the display module as per the outputs
+        * Connect the uart
+        * Power on and see the TT03 text
+        * Use the script(s) in the software directory to control the display
 
 # A description of what the inputs do
   inputs:               
