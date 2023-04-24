@@ -34,7 +34,7 @@ module led_panel_single (
                          );
 
   // column
-  reg                                 sclk;
+  wire                                sclk;
   reg                                 sclk_en;
   reg                                 blank;
   reg                                 latch;
